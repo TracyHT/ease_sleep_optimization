@@ -1,9 +1,9 @@
 import 'package:ease_sleep_optimization/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../constants/app_text.dart';
+import '../../core/constants/app_strings.dart';
 import '../../core/providers/bottom_nav_provider.dart';
-import 'middle_fab_button.dart';
+import '../components/buttons/middle_fab_button.dart';
 
 class CustomBottomNavBar extends ConsumerWidget {
   const CustomBottomNavBar({super.key});

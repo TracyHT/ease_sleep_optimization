@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../constants/app_text.dart';
-import '../constants/app_colors.dart';
+import '../../../core/constants/app_strings.dart';
+import '../../../core/constants/app_colors.dart';
 
 class MiddleFABButton extends StatelessWidget {
   final bool isSelected;
