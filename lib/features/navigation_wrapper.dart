@@ -6,7 +6,7 @@ import './statistics/screens/statistics_screen.dart';
 import './control/screens/control_screen.dart';
 import './sleepAids/screens/sleepAids_screens.dart';
 import './sleepMode/screens/sleepMode_screen.dart';
-import '../core/widgets/custom_bottom_nav.dart';
+import '../ui/widgets/custom_bottom_nav.dart';
 
 class NavigationWrapper extends ConsumerWidget {
   const NavigationWrapper({super.key});
