@@ -31,7 +31,7 @@ class AppInputStyles {
   static final InputDecorationTheme inputDecorationThemeDark =
       InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.darkSurface,
+        fillColor: AppColors.neutral500,
         contentPadding: AppSpacing.mediumPadding,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.small),

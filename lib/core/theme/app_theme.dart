@@ -11,25 +11,22 @@ class AppTheme {
     scaffoldBackgroundColor: AppColors.background,
     inputDecorationTheme: AppInputStyles.inputDecorationTheme,
 
+    textTheme: TextTheme(
+      displayLarge: AppTextStyles.displayLarge,
+      headlineMedium: AppTextStyles.headlineMedium,
+      titleLarge: AppTextStyles.titleLarge,
+      bodyLarge: AppTextStyles.bodyLarge,
+      bodyMedium: AppTextStyles.bodyMedium,
+      labelLarge: AppTextStyles.labelLarge,
+      labelMedium: AppTextStyles.labelMedium,
+    ),
+
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: AppButtonStyles.primary,
     ),
     textButtonTheme: TextButtonThemeData(style: AppButtonStyles.text),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: AppButtonStyles.outlined,
-    ),
-
-    textTheme: TextTheme(
-      displayLarge: AppTextStyles.displayLarge,
-      displayMedium: AppTextStyles.displayMedium,
-      headlineLarge: AppTextStyles.headlineLarge,
-      headlineMedium: AppTextStyles.headlineMedium,
-      titleLarge: AppTextStyles.titleLarge,
-      titleMedium: AppTextStyles.titleMedium,
-      bodyLarge: AppTextStyles.bodyLarge,
-      bodyMedium: AppTextStyles.bodyMedium,
-      labelLarge: AppTextStyles.labelLarge,
-      labelMedium: AppTextStyles.labelMedium,
     ),
 
     appBarTheme: AppBarTheme(
@@ -44,18 +41,36 @@ class AppTheme {
 
   static ThemeData dark = ThemeData(
     useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
+    colorScheme: const ColorScheme(
       brightness: Brightness.dark,
-      background: AppColors.darkBackground,
+      primary: AppColors.primary,
+      onPrimary: Colors.white,
+      secondary: AppColors.secondary,
+      onSecondary: AppColors.neutral100,
+      error: Colors.red,
+      onError: Colors.black,
+      surface: Color(0xFF121212),
+      onSurface: Colors.white,
     ),
     scaffoldBackgroundColor: AppColors.darkBackground,
     inputDecorationTheme: AppInputStyles.inputDecorationThemeDark,
 
+    textTheme: TextTheme(
+      displayLarge: AppTextStyles.displayLarge.copyWith(color: AppColors.white),
+      headlineMedium: AppTextStyles.headlineMedium.copyWith(
+        color: AppColors.white,
+      ),
+      titleLarge: AppTextStyles.titleLarge.copyWith(color: AppColors.white),
+      bodyLarge: AppTextStyles.bodyLarge.copyWith(color: AppColors.white),
+      bodyMedium: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
+      labelLarge: AppTextStyles.labelLarge.copyWith(color: AppColors.white),
+      labelMedium: AppTextStyles.labelMedium.copyWith(color: AppColors.grey),
+    ),
+
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: AppButtonStyles.primary.copyWith(
-        backgroundColor: WidgetStateProperty.all(AppColors.secondary),
-        foregroundColor: WidgetStateProperty.all(AppColors.black),
+        backgroundColor: WidgetStateProperty.all(AppColors.primary),
+        foregroundColor: WidgetStateProperty.all(AppColors.white),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
@@ -70,34 +85,6 @@ class AppTheme {
           const BorderSide(color: AppColors.secondary),
         ),
       ),
-    ),
-
-    textTheme: TextTheme(
-      displayLarge: AppTextStyles.displayLarge.copyWith(color: AppColors.white),
-      displayMedium: AppTextStyles.displayMedium.copyWith(
-        color: AppColors.white,
-      ),
-      headlineLarge: AppTextStyles.headlineLarge.copyWith(
-        color: AppColors.white,
-      ),
-      headlineMedium: AppTextStyles.headlineMedium.copyWith(
-        color: AppColors.white,
-      ),
-      titleLarge: AppTextStyles.titleLarge.copyWith(color: AppColors.white),
-      titleMedium: AppTextStyles.titleMedium.copyWith(color: AppColors.white),
-      bodyLarge: AppTextStyles.bodyLarge.copyWith(color: AppColors.white),
-      bodyMedium: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
-      labelLarge: AppTextStyles.labelLarge.copyWith(color: AppColors.white),
-      labelMedium: AppTextStyles.labelMedium.copyWith(color: AppColors.white),
-    ),
-
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.darkBackground,
-      foregroundColor: AppColors.white,
-      elevation: 0,
-      titleTextStyle: AppTextStyles.titleLarge.copyWith(color: AppColors.white),
-      iconTheme: const IconThemeData(color: AppColors.white),
-      centerTitle: true,
     ),
   );
 }

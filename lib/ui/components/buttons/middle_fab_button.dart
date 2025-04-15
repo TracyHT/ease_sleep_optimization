@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_strings.dart';
-import '../../../core/constants/app_colors.dart';
 
 class MiddleFABButton extends StatelessWidget {
   final bool isSelected;
@@ -14,22 +13,30 @@ class MiddleFABButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final Color secondaryColor = theme.colorScheme.secondary;
+    final Color onSecondary = theme.colorScheme.onSecondary;
+
     return Column(
       children: [
         FloatingActionButton(
           onPressed: onTap,
-          backgroundColor: isSelected ? AppColors.primary : Colors.grey,
-          foregroundColor: Colors.white,
-          elevation: 6,
+          backgroundColor: secondaryColor,
+          foregroundColor: onSecondary,
+          elevation: isSelected ? 8 : 4,
           shape: const CircleBorder(),
           child: const Icon(Icons.bed),
         ),
         const SizedBox(height: 4),
         Text(
-          AppTexts.sleep, // Custom label
+          AppTexts.sleep,
           style: TextStyle(
-            color: isSelected ? AppColors.primary : Colors.grey,
+            color:
+                isSelected
+                    ? secondaryColor
+                    : theme.colorScheme.onBackground.withOpacity(0.5),
             fontSize: 12,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
       ],

@@ -25,9 +25,19 @@ class CustomBottomNavBar extends ConsumerWidget {
             child: BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
               currentIndex: currentIndex,
-              backgroundColor: Colors.white,
-              selectedItemColor: AppColors.primary,
-
+              backgroundColor: AppColors.neutral900,
+              selectedItemColor: Theme.of(context).colorScheme.primary,
+              unselectedItemColor: Theme.of(
+                context,
+              ).colorScheme.onBackground.withOpacity(0.6),
+              selectedIconTheme: IconThemeData(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              unselectedIconTheme: IconThemeData(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onBackground.withOpacity(0.6),
+              ),
               onTap: (index) {
                 if (index == 2) return;
                 ref.read(bottomNavIndexProvider.notifier).state = index;
@@ -41,10 +51,7 @@ class CustomBottomNavBar extends ConsumerWidget {
                   icon: Icon(Icons.healing),
                   label: AppTexts.sleepAids,
                 ),
-                BottomNavigationBarItem(
-                  icon: SizedBox.shrink(),
-                  label: '', // Không label để tránh đúp
-                ),
+                BottomNavigationBarItem(icon: SizedBox.shrink(), label: ''),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.power),
                   label: AppTexts.control,

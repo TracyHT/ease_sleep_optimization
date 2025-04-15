@@ -23,7 +23,7 @@ class AppButtonStyles {
   // Secondary Button Style
   static final secondary = ElevatedButton.styleFrom(
     backgroundColor: AppColors.secondary,
-    foregroundColor: AppColors.black,
+    foregroundColor: AppColors.neutral700,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(AppSpacing.small),
     ),
