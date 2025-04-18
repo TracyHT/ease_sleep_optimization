@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "870839618171",
+    "project_id": "ease-sleep-tracking-app",
+    "storage_bucket": "ease-sleep-tracking-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:870839618171:android:6a13c6c32df070bd00b0de",
+        "android_client_info": {
+          "package_name": "com.htthuy.ease_sleep_optimization"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeFUk67SDPYoK1a1J8ToiWdgjMfWvILXs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
