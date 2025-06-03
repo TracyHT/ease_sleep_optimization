@@ -1,4 +1,4 @@
-import 'package:ease_sleep_optimization/features/statistics/models/sleep_summary_data.dart';
+import 'package:ease_sleep_optimization/core/models/sleep_summary_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'selected_date_provider.dart';
 import '../widgets/sleep_summary_widget.dart';

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pie_chart/pie_chart.dart';
-import '../models/sleep_summary_data.dart';
+import '../../../core/models/sleep_summary_data.dart';
 
 class SleepSummaryWidget extends StatelessWidget {
   final SleepSummaryData data;
@@ -20,16 +19,6 @@ class SleepSummaryWidget extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final screenHeight = MediaQuery.of(context).size.height;
-
-    final pieData = {
-      'Efficiency': data.efficiency.toDouble(),
-      'Inefficiency': (100 - data.efficiency).toDouble(),
-    };
-
-    final pieColors = [
-      colorScheme.primary,
-      colorScheme.primary.withOpacity(0.3),
-    ];
 
     return Column(
       mainAxisSize: MainAxisSize.min,
