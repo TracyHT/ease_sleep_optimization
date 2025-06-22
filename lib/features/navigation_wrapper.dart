@@ -23,8 +23,24 @@ class NavigationWrapper extends ConsumerWidget {
     ];
 
     return Scaffold(
-      body: screens[index],
-      bottomNavigationBar: CustomBottomNavBar(),
-    );
+  body: screens[index],
+  bottomNavigationBar: const CustomBottomNavBar(),
+  floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+  floatingActionButton: Padding(
+    padding: const EdgeInsets.only(bottom: 10), 
+    child: FloatingActionButton(
+      onPressed: () {
+        ref.read(bottomNavIndexProvider.notifier).state = 2;
+      },
+      shape: const CircleBorder(),
+      backgroundColor: Theme.of(context).colorScheme.secondary,
+      foregroundColor: Theme.of(context).colorScheme.onSecondary,
+      elevation: index == 2 ? 8 : 4,
+      child: const Icon(Icons.bed),
+    ),
+  ),
+);
+
+
   }
 }
