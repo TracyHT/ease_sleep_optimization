@@ -5,6 +5,7 @@ import '../widgets/date_picker_widget.dart';
 import '../widgets/sleep_summary_widget.dart';
 import '../widgets/sleep_stage_chart_widget.dart';
 import '../providers/sleep_data_provider.dart';
+import '../../../ui/components/section_heading.dart';
 
 class StatisticsScreen extends ConsumerWidget {
   const StatisticsScreen({super.key});
@@ -37,27 +38,13 @@ class StatisticsScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 12),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Today',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    'Trend',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+              SectionHeading(
+                title: "Today",
+                nav: "Trend",
+                onTap: () {
+                  // Navigate to detailed statistics screen
+                },
               ),
-
-              SizedBox(height: screenHeight * 0.03),
 
               const DatePickerWidget(),
 

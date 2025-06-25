@@ -1,5 +1,7 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../../../core/models/sleep_summary_data.dart';
+import '../../../ui/components/buttons/secondary_button.dart';
 
 class SleepSummaryWidget extends StatelessWidget {
   final SleepSummaryData data;
@@ -25,35 +27,69 @@ class SleepSummaryWidget extends StatelessWidget {
       children: [
         // Container with pie chart + summary inside
         Container(
-          padding: EdgeInsets.all(screenHeight * 0.02),
+          padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: colorScheme.primaryContainer.withOpacity(0.15),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _SleepScoreCircle(score: data.score, size: screenHeight * 0.10),
-              SizedBox(width: screenHeight * 0.02),
+              Column(
+                children: [
+                  _SleepScoreCircle(
+                    score: data.score,
+                    size: screenHeight * 0.10,
+                  ),
+                  const SizedBox(height: 12),
+                  Text('Sleep Score', style: textTheme.bodyMedium),
+                ],
+              ),
+
+              SizedBox(width: 24),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      _formatDuration(data.totalSleep),
-                      style: textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Total Sleep
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _formatDuration(data.totalSleep),
+                              style: textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text('Total Sleep', style: textTheme.bodyMedium),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        // Efficiency
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${data.efficiency}%',
+                              style: textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text('Efficiency', style: textTheme.bodyMedium),
+                          ],
+                        ),
+                      ],
                     ),
-                    Text('Total Sleep', style: textTheme.bodyMedium),
-                    SizedBox(height: screenHeight * 0.015),
-                    Text(
-                      '${data.efficiency}%',
-                      style: textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    const SizedBox(height: 16),
+                    SecondaryButton(
+                      text: 'View Details',
+                      onPressed: () {
+                        // TODO: handle button press
+                      },
                     ),
-                    Text('Efficiency', style: textTheme.bodyMedium),
                   ],
                 ),
               ),
