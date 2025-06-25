@@ -21,7 +21,7 @@ class StatisticsScreen extends ConsumerWidget {
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           padding: EdgeInsets.only(
-            top: 40.0 + MediaQuery.of(context).padding.top,
+            top: MediaQuery.of(context).padding.top,
             left: AppSpacing.screenEdgePadding.left,
             right: AppSpacing.screenEdgePadding.right,
             bottom: AppSpacing.screenEdgePadding.bottom,

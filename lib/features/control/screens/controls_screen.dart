@@ -35,7 +35,7 @@ class ControlsScreen extends ConsumerWidget {
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(
             AppSpacing.screenEdgePadding.left,
-            40.0 + MediaQuery.of(context).padding.top,
+            MediaQuery.of(context).padding.top,
             AppSpacing.screenEdgePadding.right,
             AppSpacing.screenEdgePadding.bottom,
           ),
@@ -45,7 +45,7 @@ class ControlsScreen extends ConsumerWidget {
               // Header
               Text(
                 'Smart Sleep Controls',
-                style: theme.textTheme.headlineSmall?.copyWith(
+                style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
