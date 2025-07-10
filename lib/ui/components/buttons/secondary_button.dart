@@ -21,17 +21,16 @@ class SecondaryButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
       style: AppButtonStyles.primary.copyWith(
-        // Tùy chỉnh minimumSize nếu không full-width
         minimumSize:
             isFullWidth
                 ? WidgetStateProperty.all(const Size(double.infinity, 48))
                 : WidgetStateProperty.all(const Size(120, 48)),
-        // Tùy chỉnh màu khi disabled
+
         backgroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
             return AppColors.grey.withOpacity(0.5);
           }
-          return AppColors.primary;
+          return AppColors.primary.withOpacity(0.8);
         }),
         foregroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
