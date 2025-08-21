@@ -3,10 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../ui/components/section_heading.dart';
 import '../widgets/small_audio_card.dart';
 import '../widgets/suggestion_card.dart';
-import '../widgets/audio_player_controls.dart';
-import '../providers/sleep_sounds_provider.dart';
-import '../providers/audio_player_provider.dart';
-import '../../../core/models/sleep_sound.dart';
 
 class SleepaidsScreens extends ConsumerWidget {
   const SleepaidsScreens({super.key});
@@ -15,8 +11,6 @@ class SleepaidsScreens extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final sleepSounds = ref.watch(sleepSoundsProvider);
-    final audioState = ref.watch(audioPlayerProvider);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -56,8 +50,7 @@ class SleepaidsScreens extends ConsumerWidget {
                         // navigate to Recently Played screen
                       },
                     ),
-                    _buildHorizontalList(sleepSounds.where((s) => s.category == SoundCategory.nature.displayName).toList()),
-                    
+                    _buildHorizontalList(),
                     SectionHeading(
                       title: "Suggested for you",
                       nav: "More",
@@ -66,18 +59,18 @@ class SleepaidsScreens extends ConsumerWidget {
                     const LargeSuggestionCard(),
 
                     SectionHeading(
-                      title: "White Noise",
+                      title: "Healing Sounds",
                       nav: "More",
                       onTap: () {},
                     ),
-                    _buildHorizontalList(sleepSounds.where((s) => s.category == SoundCategory.whiteNoise.displayName).toList()),
+                    _buildHorizontalList(),
 
                     SectionHeading(
-                      title: "Meditation",
+                      title: "Sleep Articles",
                       nav: "More",
                       onTap: () {},
                     ),
-                    _buildHorizontalList(sleepSounds.where((s) => s.category == SoundCategory.meditation.displayName).toList()),
+                    _buildHorizontalList(),
                   ],
                 ),
               ),
@@ -85,45 +78,25 @@ class SleepaidsScreens extends ConsumerWidget {
           ),
         ),
       ),
-      // Add floating audio player controls
-      bottomSheet: audioState.currentSound != null
-          ? Container(
-              color: colorScheme.surface,
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: AudioPlayerControls(
-                    sound: audioState.currentSound,
-                    showVolumeSlider: false,
-                    showProgressBar: true,
-                  ),
-                ),
-              ),
-            )
-          : null,
     );
   }
 
-  Widget _buildHorizontalList(List<SleepSound> sounds) {
-    if (sounds.isEmpty) {
-      return const SizedBox(height: 80);
-    }
-    
+  Widget _buildHorizontalList() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
+
       child: Row(
-        children: sounds.take(5).map((sound) {
-          final index = sounds.indexOf(sound);
-          return Padding(
-            padding: EdgeInsets.only(right: index < sounds.length - 1 && index < 4 ? 12 : 0),
-            child: SmallAudioCard(
-              sound: sound,
-              title: sound.title,
-              imagePath: sound.imagePath,
-              subtitle: sound.subtitle,
+        children: List.generate(
+          5,
+          (index) => Padding(
+            padding: EdgeInsets.only(right: index < 4 ? 12 : 0),
+            child: const SmallAudioCard(
+              title: "Rain",
+              imagePath: null,
+              subtitle: "White Noise",
             ),
-          );
-        }).toList(),
+          ),
+        ),
       ),
     );
   }

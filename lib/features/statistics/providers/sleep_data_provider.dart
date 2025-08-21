@@ -1,45 +1,14 @@
 import 'package:ease_sleep_optimization/core/models/sleep_summary_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'selected_date_provider.dart';
-import '../../../services/statistics_data_service.dart';
+import '../widgets/sleep_summary_widget.dart';
 
-final sleepDataProvider = FutureProvider<SleepSummaryData?>((ref) async {
+final sleepDataProvider = FutureProvider<SleepSummaryData>((ref) async {
   final selectedDate = ref.watch(selectedDateProvider);
-  
-  // Get current user
-  final currentUser = FirebaseAuth.instance.currentUser;
-  if (currentUser == null) {
-    return null;
-  }
 
-  // Get real sleep data from Hive database
-  try {
-    print('Loading sleep data for user ${currentUser.uid} on date ${selectedDate.toString().substring(0, 10)}');
-    
-    final sleepData = await StatisticsDataService.getSleepDataForDate(
-      firebaseUid: currentUser.uid,
-      date: selectedDate,
-    );
-    
-    if (sleepData != null) {
-      print('Found sleep data: score=${sleepData.score}, sleep=${sleepData.totalSleep}');
-    } else {
-      print('No sleep data found for this date');
-    }
-    
-    return sleepData;
-  } catch (e) {
-    print('Error loading sleep data: $e');
-    
-    // Return null instead of mock data to show no-data state
-    return null;
-  }
-});
-
-// Fallback mock data for demonstration
-SleepSummaryData _getMockDataForDate(DateTime date) {
-  final mockData = {
+  // TODO: gọi API hoặc DB để lấy data theo ngày
+  // Tạm thời mock data theo ngày
+  final mock = {
     1: SleepSummaryData(
       score: 80,
       totalSleep: Duration(hours: 7, minutes: 40),
@@ -70,5 +39,6 @@ SleepSummaryData _getMockDataForDate(DateTime date) {
     ),
   };
 
-  return mockData[date.day] ?? mockData[10]!;
-}
+  await Future.delayed(const Duration(milliseconds: 500)); // simulate loading
+  return mock[selectedDate.day] ?? mock[10]!;
+});
