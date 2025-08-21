@@ -16,6 +16,55 @@ class SleepStageChartWidget extends StatelessWidget {
     return varied.clamp(0, 3);
   }
 
+  // Create from sleep stage scoring data
+  factory SleepStageChartWidget.fromDatabase({
+    required List<Map<String, dynamic>> stageScoring,
+    required DateTime startTime,
+  }) {
+    if (stageScoring.isEmpty) {
+      return SleepStageChartWidget.mock(); // Fallback to mock data
+    }
+
+    final List<SleepStageData> chartData = [];
+    
+    // Sort scoring by epoch index
+    final sortedScoring = List<Map<String, dynamic>>.from(stageScoring);
+    sortedScoring.sort((a, b) => (a['epochIndex'] as int).compareTo(b['epochIndex'] as int));
+    
+    for (final scoring in sortedScoring) {
+      final epochIndex = scoring['epochIndex'] as int;
+      final sleepStage = scoring['sleepStage'] as String;
+      
+      // Convert sleep stage to numeric value for chart
+      int stageValue;
+      switch (sleepStage) {
+        case 'Wake':
+          stageValue = 3;
+          break;
+        case 'REM':
+          stageValue = 2;
+          break;
+        case 'N1':
+          stageValue = 1;
+          break;
+        case 'N2':
+          stageValue = 1;
+          break;
+        case 'N3':
+          stageValue = 0;
+          break;
+        default:
+          stageValue = 1;
+      }
+      
+      // Each epoch represents 30 seconds, convert to time
+      final epochTime = startTime.add(Duration(seconds: epochIndex * 30));
+      chartData.add(SleepStageData(epochTime, stageValue));
+    }
+    
+    return SleepStageChartWidget(data: chartData);
+  }
+
   // Mock data with 30-minute intervals and varied stage values for more natural curve
   factory SleepStageChartWidget.mock() {
     final now = DateTime.now();
