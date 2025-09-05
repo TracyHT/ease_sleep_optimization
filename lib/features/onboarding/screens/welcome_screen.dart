@@ -24,25 +24,20 @@ class WelcomeScreen extends StatelessWidget {
                 const Spacer(flex: 2),
 
                 // App Illustration
-                Image.asset(
-                  'lib/assets/images/illustration.png',
-                  fit: BoxFit.contain,
-                  width: 160,
-                  height: 160,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Iconsax.moon5,
-                      color: colorScheme.primary,
-                      size: 64,
-                    );
-                  },
+                Center(
+                  child: Image.asset(
+                    'lib/assets/images/illustration.png',
+                    fit: BoxFit.contain,
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: MediaQuery.of(context).size.width * 0.8,
+                  ),
                 ),
 
-                const SizedBox(height: AppSpacing.xLarge),
+                const SizedBox(height: AppSpacing.small),
 
                 // Main Heading
                 Text(
-                  'Find your calm with Ease',
+                  'Find your calm \nwith Ease',
                   style: theme.textTheme.displaySmall?.copyWith(
                     color: colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
@@ -93,7 +88,7 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                       ),
                       child: const Text(
-                        'Already have an account? Login',
+                        'Login',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
