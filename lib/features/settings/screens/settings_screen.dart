@@ -8,6 +8,14 @@ import '../../../core/providers/user_provider.dart';
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
+  Future<void> handleLogout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Logged out')));
+  }
+
   @override
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
@@ -227,6 +235,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 // ),
                 const _SettingTile(title: "Privacy"),
                 const _SettingTile(title: "Measurement Units"),
+                
+                // Database Test Button (Development only)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    'Database Test',
+                    style: TextStyle(color: colorScheme.primary),
+                  ),
+                  trailing: Icon(
+                    Icons.bug_report,
+                    color: colorScheme.primary,
+                  ),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/database-test');
+                  },
+                ),
                 const SizedBox(height: 40),
 
                 // Action Buttons

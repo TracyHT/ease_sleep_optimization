@@ -47,3 +47,4 @@ app.*.map.json
 ios/GoogleService-Info.plist
 ios/Podfile
 *.xcconfig
+server/.env
