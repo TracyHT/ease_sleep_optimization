@@ -323,7 +323,7 @@ class StatisticsDataService {
       
       // Find metrics for this session
       for (final entry in metricsBox.toMap().entries) {
-        final metrics = entry.value as Map<String, dynamic>;
+        final metrics = Map<String, dynamic>.from(entry.value as Map);
         if (metrics['sessionId'] == sessionId) {
           return metrics;
         }
@@ -372,7 +372,7 @@ class StatisticsDataService {
       
       // Calculate sleep efficiency (time asleep / time in bed)
       final timeAsleep = timeInN1 + timeInN2 + timeInN3 + timeInREM;
-      final efficiency = (timeAsleep / 100 * 100).round(); // Percentage
+      final efficiency = timeAsleep.round(); // Already a percentage from stage distribution
       
       // Calculate sleep latency (assume first 30min of wake time is latency)
       final latency = (timeInWake * 0.3 * totalSleep.inMinutes / 100).round();

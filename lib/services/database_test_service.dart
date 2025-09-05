@@ -388,14 +388,14 @@ class DatabaseTestService {
           dataFilePath: '/data/eeg/session_$sessionId.csv',
         );
         
-        // Add sleep quality metrics
+        // Add sleep quality metrics (as percentages)
         await LocalDatabaseService.saveSleepQualityMetrics(
           sessionId: sessionId,
-          timeInWake: 0.10 + random.nextDouble() * 0.10,
-          timeInN1: 0.05 + random.nextDouble() * 0.05,
-          timeInN2: 0.40 + random.nextDouble() * 0.10,
-          timeInN3: 0.15 + random.nextDouble() * 0.10,
-          timeInREM: 0.15 + random.nextDouble() * 0.10,
+          timeInWake: 10.0 + random.nextDouble() * 10.0, // 10-20%
+          timeInN1: 5.0 + random.nextDouble() * 5.0,    // 5-10%
+          timeInN2: 40.0 + random.nextDouble() * 10.0,  // 40-50%
+          timeInN3: 15.0 + random.nextDouble() * 10.0,  // 15-25%
+          timeInREM: 15.0 + random.nextDouble() * 10.0, // 15-25%
         );
         
         // Add environmental data

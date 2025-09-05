@@ -49,8 +49,8 @@ class SleepStageChartWidget extends StatelessWidget {
           stageValue = 1;
       }
       
-      // Each epoch represents 30 seconds, convert to time
-      final epochTime = startTime.add(Duration(seconds: epochIndex * 30));
+      // Each epoch represents 24 minutes (8 hours / 20 epochs), convert to time
+      final epochTime = startTime.add(Duration(minutes: epochIndex * 24));
       chartData.add(SleepStageData(epochTime, stageValue));
     }
     

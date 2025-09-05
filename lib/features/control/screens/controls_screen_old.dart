@@ -52,7 +52,7 @@ class ControlsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      '${_getConnectedDevicesCount(controls)} devices connected',
+                      '${controls['devicesConnected']} devices connected',
                       style: theme.textTheme.bodyMedium,
                     ),
                   ],
@@ -158,25 +158,6 @@ class ControlsScreen extends ConsumerWidget {
     );
   }
 
-  // Helper method to count connected devices
-  int _getConnectedDevicesCount(Map<String, dynamic> controls) {
-    int count = 0;
-    final deviceStatuses = [
-      controls['brainbitStatus'],
-      controls['thermostatStatus'],
-      controls['lightStatus'],
-      controls['airQualityStatus'],
-      controls['soundStatus'],
-    ];
-    
-    for (final status in deviceStatuses) {
-      if (status?.toString().toLowerCase() == 'connected') {
-        count++;
-      }
-    }
-    return count;
-  }
-
   // Helper method to build device status rows
   Widget _buildDeviceStatusRow(BuildContext context, String deviceType, String status, IconData icon) {
     final theme = Theme.of(context);
@@ -256,10 +237,8 @@ class _DeviceConnectionCard extends StatelessWidget {
         ),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Device Info Row
           Row(
             children: [
               CircleAvatar(
@@ -275,7 +254,6 @@ class _DeviceConnectionCard extends StatelessWidget {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       deviceName,
@@ -283,7 +261,6 @@ class _DeviceConnectionCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 2),
                     Text(
                       deviceType,
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -310,157 +287,41 @@ class _DeviceConnectionCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          
-          // Action Buttons
-          if (!isConnected) 
-            // Connect Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: onConnect,
-                icon: const Icon(Iconsax.link, size: 16),
-                label: const Text('Connect Device'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                  foregroundColor: theme.colorScheme.primary,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-              ),
-            )
-          else
-            // Connected - Show Disconnect and Settings
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _showDisconnectDialog(context, deviceName, onDisconnect),
-                    icon: const Icon(Iconsax.close_circle, size: 16),
-                    label: const Text('Disconnect'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.withValues(alpha: 0.1),
-                      foregroundColor: Colors.red,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: isConnected ? onDisconnect : onConnect,
+                  icon: Icon(
+                    isConnected ? Iconsax.link_circle : Iconsax.link_circle,
+                    size: 16,
+                  ),
+                  label: Text(isConnected ? 'Disconnect' : 'Connect'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isConnected 
+                        ? Colors.red.withValues(alpha: 0.1)
+                        : theme.colorScheme.primary.withValues(alpha: 0.1),
+                    foregroundColor: isConnected ? Colors.red : theme.colorScheme.primary,
+                    elevation: 0,
                   ),
                 ),
+              ),
+              if (isConnected) ...[
                 const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _showDeviceSettings(context, deviceName),
-                    icon: const Icon(Iconsax.setting_2, size: 16),
-                    label: const Text('Settings'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.colorScheme.secondary.withValues(alpha: 0.1),
-                      foregroundColor: theme.colorScheme.secondary,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // TODO: Open device settings
+                  },
+                  icon: const Icon(Iconsax.setting_2, size: 16),
+                  label: const Text('Settings'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.secondary.withValues(alpha: 0.1),
+                    foregroundColor: theme.colorScheme.secondary,
+                    elevation: 0,
                   ),
                 ),
               ],
-            ),
-        ],
-      ),
-    );
-  }
-
-  // Show disconnect confirmation dialog
-  void _showDisconnectDialog(BuildContext context, String deviceName, VoidCallback onDisconnect) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2E2E2E),
-        title: Row(
-          children: [
-            const Icon(Iconsax.warning_2, color: Colors.orange),
-            const SizedBox(width: 12),
-            Text(
-              'Disconnect Device',
-              style: const TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-        content: Text(
-          'Are you sure you want to disconnect $deviceName? This will stop monitoring and control features for this device.',
-          style: const TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Colors.white70),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              onDisconnect();
-            },
-            child: const Text(
-              'Disconnect',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Show device settings dialog
-  void _showDeviceSettings(BuildContext context, String deviceName) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2E2E2E),
-        title: Row(
-          children: [
-            const Icon(Iconsax.setting_2, color: Colors.white),
-            const SizedBox(width: 12),
-            Text(
-              '$deviceName Settings',
-              style: const TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Iconsax.cpu_charge, color: Colors.white70),
-              title: const Text('Device Information', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.of(context).pop();
-                // TODO: Show device info
-              },
-            ),
-            ListTile(
-              leading: const Icon(Iconsax.notification, color: Colors.white70),
-              title: const Text('Notifications', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.of(context).pop();
-                // TODO: Configure notifications
-              },
-            ),
-            ListTile(
-              leading: const Icon(Iconsax.refresh, color: Colors.white70),
-              title: const Text('Calibrate Device', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.of(context).pop();
-                // TODO: Start calibration
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Close',
-              style: TextStyle(color: Colors.white70),
-            ),
+            ],
           ),
         ],
       ),
@@ -485,7 +346,6 @@ class _SectionCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.medium),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
