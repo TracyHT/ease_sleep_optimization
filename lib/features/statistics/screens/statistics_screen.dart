@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:iconsax/iconsax.dart';
 import '../../../core/constants/app_spacings.dart';
 import '../widgets/date_picker_widget.dart';
 import '../widgets/sleep_summary_widget.dart';
@@ -10,6 +11,7 @@ import '../providers/selected_date_provider.dart';
 import '../../../services/statistics_data_service.dart';
 import '../../../services/local_database_service.dart';
 import '../../../ui/components/section_heading.dart';
+import '../../../ui/components/gradient_background.dart';
 
 class StatisticsScreen extends ConsumerWidget {
   const StatisticsScreen({super.key});
@@ -22,7 +24,9 @@ class StatisticsScreen extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      body: SafeArea(
+      body: GradientBackground(
+        primaryOpacity: 0.05,
+        child: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           padding: EdgeInsets.only(
@@ -50,7 +54,7 @@ class StatisticsScreen extends ConsumerWidget {
                       ref.invalidate(sleepDataProvider);
                     },
                     icon: Icon(
-                      Icons.refresh,
+                      Iconsax.refresh5,
                       color: colorScheme.primary,
                     ),
                     tooltip: 'Refresh data',
@@ -123,6 +127,7 @@ class StatisticsScreen extends ConsumerWidget {
             ],
           ),
         ),
+        ),
       ),
     );
   }
@@ -138,7 +143,7 @@ class StatisticsScreen extends ConsumerWidget {
         child: Column(
           children: [
             Icon(
-              Icons.bedtime_outlined,
+              Iconsax.moon5,
               size: 48,
               color: colorScheme.onSurface.withValues(alpha: 0.6),
             ),
@@ -167,7 +172,7 @@ class StatisticsScreen extends ConsumerWidget {
                     onPressed: () {
                       Navigator.pushNamed(context, '/database-test');
                     },
-                    icon: const Icon(Icons.science),
+                    icon: const Icon(Iconsax.candle_25),
                     label: const Text('Generate Data'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,
@@ -183,7 +188,7 @@ class StatisticsScreen extends ConsumerWidget {
                       // Force refresh by invalidating the provider
                       ref.invalidate(sleepDataProvider);
                     },
-                    icon: const Icon(Icons.refresh),
+                    icon: const Icon(Iconsax.refresh5),
                     label: const Text('Refresh'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.secondary,
@@ -295,7 +300,7 @@ class StatisticsScreen extends ConsumerWidget {
               child: Row(
                 children: [
                   Icon(
-                    Icons.eco,
+                    Iconsax.tree5,
                     color: colorScheme.primary,
                   ),
                   const SizedBox(width: AppSpacing.medium),
@@ -354,7 +359,7 @@ class StatisticsScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
-            Icons.radio_button_checked,
+            Iconsax.record_circle5,
             size: 18,
             color: colorScheme.primary,
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax/iconsax.dart';
 import '../../../core/models/sleep_sound.dart';
 import '../providers/audio_player_provider.dart';
 
@@ -57,7 +58,7 @@ class SmallAudioCard extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
-                        Icons.music_note,
+                        Iconsax.music5,
                         color: Colors.white70,
                         size: 20,
                       ),
@@ -72,7 +73,7 @@ class SmallAudioCard extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
-                        Icons.pause,
+                        Iconsax.pause5,
                         color: Colors.white,
                         size: 20,
                       ),
@@ -86,7 +87,7 @@ class SmallAudioCard extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
-                        Icons.play_arrow,
+                        Iconsax.play5,
                         color: Colors.white,
                         size: 20,
                       ),

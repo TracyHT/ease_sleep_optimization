@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax/iconsax.dart';
 import '../../../ui/components/section_heading.dart';
 import '../widgets/small_audio_card.dart';
 import '../widgets/suggestion_card.dart';
@@ -7,6 +8,7 @@ import '../widgets/modern_audio_player.dart';
 import '../providers/sleep_sounds_provider.dart';
 import '../providers/audio_player_provider.dart';
 import '../../../core/models/sleep_sound.dart';
+import '../../../ui/components/gradient_background.dart';
 
 class SleepaidsScreens extends ConsumerWidget {
   const SleepaidsScreens({super.key});
@@ -18,7 +20,9 @@ class SleepaidsScreens extends ConsumerWidget {
     final sleepSoundsAsync = ref.watch(sleepSoundsProvider);
     final audioState = ref.watch(audioPlayerProvider);
     return Scaffold(
-      body: SafeArea(
+      body: GradientBackground(
+        primaryOpacity: 0.05,
+        child: SafeArea(
         child: sleepSoundsAsync.when(
           data: (sleepSounds) => SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(
@@ -102,7 +106,7 @@ class SleepaidsScreens extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                const Icon(Iconsax.warning_2, color: Colors.red, size: 48),
                 const SizedBox(height: 16),
                 Text(
                   'Failed to load sleep sounds',
@@ -122,6 +126,7 @@ class SleepaidsScreens extends ConsumerWidget {
               ],
             ),
           ),
+        ),
         ),
       ),
       // Add modern floating audio player

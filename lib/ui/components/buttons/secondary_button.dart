@@ -49,7 +49,13 @@ class SecondaryButton extends StatelessWidget {
                   color: AppColors.white,
                 ),
               )
-              : Text(text),
+              : Text(
+                text,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
     );
   }
 }

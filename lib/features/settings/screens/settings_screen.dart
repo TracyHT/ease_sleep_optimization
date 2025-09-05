@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:iconsax/iconsax.dart';
 import '../../../core/constants/app_spacings.dart';
+import '../../../ui/components/gradient_background.dart';
 import '../../../services/api_services.dart';
 import '../../../core/providers/user_provider.dart';
 
@@ -94,7 +96,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     //final themeMode = ref.watch(themeModeProvider);
 
     return Scaffold(
-      body: SafeArea(
+      body: GradientBackground(
+        primaryOpacity: 0.05,
+        child: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.only(
@@ -118,7 +122,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         radius: 40,
                         backgroundColor: colorScheme.primary.withOpacity(0.3),
                         child: Icon(
-                          Icons.person,
+                          Iconsax.user5,
                           size: 40,
                           color: colorScheme.onPrimary,
                         ),
@@ -177,7 +181,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         backgroundColor: colorScheme.primary.withOpacity(0.3),
                         radius: 24,
                         child: Icon(
-                          Icons.security,
+                          Iconsax.shield_tick5,
                           size: 28,
                           color: colorScheme.onPrimary,
                         ),
@@ -244,7 +248,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     style: TextStyle(color: colorScheme.primary),
                   ),
                   trailing: Icon(
-                    Icons.bug_report,
+                    Iconsax.code5,
                     color: colorScheme.primary,
                   ),
                   onTap: () {
@@ -280,6 +284,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ],
             ),
           ),
+        ),
         ),
       ),
     );
@@ -340,7 +345,7 @@ class _SettingTile extends StatelessWidget {
       trailing:
           trailing ??
           Icon(
-            Icons.arrow_forward_ios,
+            Iconsax.arrow_right_35,
             size: 16,
             color: colorScheme.onSurface.withOpacity(0.6),
           ),

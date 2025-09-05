@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax/iconsax.dart';
 import 'dart:ui';
 import '../../../core/models/sleep_sound.dart';
 import '../providers/audio_player_provider.dart';
@@ -175,7 +176,7 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
                                             ),
                                           ),
                                           child: const Icon(
-                                            Icons.music_note_rounded,
+                                            Iconsax.music5,
                                             color: Colors.white,
                                             size: 24,
                                           ),
@@ -236,8 +237,8 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
                                   duration: const Duration(milliseconds: 200),
                                   child: Icon(
                                     audioState.isPlaying 
-                                      ? Icons.pause_rounded 
-                                      : Icons.play_arrow_rounded,
+                                      ? Iconsax.pause5 
+                                      : Iconsax.play5,
                                     key: ValueKey(audioState.isPlaying),
                                     color: Colors.white,
                                     size: 32,
@@ -359,7 +360,7 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
             // Toggle loop functionality
           },
           icon: Icon(
-            Icons.repeat_rounded,
+            Iconsax.repeat5,
             color: audioState.currentSound?.isLooping == true 
               ? Colors.white 
               : Colors.white.withValues(alpha: 0.3),
@@ -404,8 +405,8 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
                   )
                 : Icon(
                     audioState.isPlaying 
-                      ? Icons.pause_rounded 
-                      : Icons.play_arrow_rounded,
+                      ? Iconsax.pause5 
+                      : Iconsax.play5,
                     key: ValueKey(audioState.isPlaying),
                     color: Colors.white,
                     size: 32,
@@ -420,7 +421,7 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
         IconButton(
           onPressed: () => audioNotifier.stop(),
           icon: Icon(
-            Icons.stop_rounded,
+            Iconsax.stop5,
             color: Colors.white.withValues(alpha: 0.7),
             size: 24,
           ),
@@ -433,7 +434,7 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
     return Row(
       children: [
         Icon(
-          Icons.volume_down_rounded,
+          Iconsax.volume_low5,
           color: Colors.white.withValues(alpha: 0.5),
           size: 20,
         ),
@@ -457,7 +458,7 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
           ),
         ),
         Icon(
-          Icons.volume_up_rounded,
+          Iconsax.volume_high5,
           color: Colors.white.withValues(alpha: 0.5),
           size: 20,
         ),

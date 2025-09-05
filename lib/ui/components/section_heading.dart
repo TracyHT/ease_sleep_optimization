@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax/iconsax.dart';
 
 class SectionHeading extends ConsumerWidget {
   final String title;
@@ -40,9 +41,9 @@ class SectionHeading extends ConsumerWidget {
                     color: const Color(0xFF89C3FF),
                   ),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 8),
                 const Icon(
-                  Icons.arrow_forward_ios,
+                  Iconsax.arrow_right_25,
                   size: 16,
                   color: Color(0xFF89C3FF),
                 ),

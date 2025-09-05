@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax/iconsax.dart';
 import '../../../core/constants/app_spacings.dart';
 import '../providers/controls_provider.dart';
+import '../../../ui/components/gradient_background.dart';
 import 'alarm_settings_screen.dart';
 
 class ControlsScreen extends ConsumerWidget {
@@ -31,7 +33,9 @@ class ControlsScreen extends ConsumerWidget {
     final controls = ref.watch(controlsProvider);
 
     return Scaffold(
-      body: SafeArea(
+      body: GradientBackground(
+        primaryOpacity: 0.05,
+        child: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(
             AppSpacing.screenEdgePadding.left,
@@ -59,7 +63,7 @@ class ControlsScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Icon(Icons.devices, size: 18, color: colorScheme.primary),
+                  Icon(Iconsax.setting_2, size: 18, color: colorScheme.primary),
                   const SizedBox(width: 6),
                   Text(
                     '${controls['devicesConnected']} devices connected',
@@ -138,13 +142,14 @@ class ControlsScreen extends ConsumerWidget {
                           (device) => _DeviceRow(
                             name: device['name'],
                             status: device['status'],
-                            icon: Icons.memory, // Replace with logic if needed
+                            icon: Iconsax.cpu_charge, // Replace with logic if needed
                           ),
                         )
                         .toList(),
               ),
             ],
           ),
+        ),
         ),
       ),
     );
@@ -211,7 +216,7 @@ class _AlarmField extends StatelessWidget {
       ),
       subtitle: Text(value, style: theme.textTheme.bodySmall),
       trailing: const Icon(
-        Icons.arrow_forward_ios,
+        Iconsax.arrow_right_3,
         size: 16,
         color: Colors.grey,
       ),

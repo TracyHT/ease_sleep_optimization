@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax/iconsax.dart';
 import '../core/providers/bottom_nav_provider.dart';
 import './settings/screens/settings_screen.dart';
 import './statistics/screens/statistics_screen.dart';
@@ -36,7 +37,7 @@ class NavigationWrapper extends ConsumerWidget {
       backgroundColor: Theme.of(context).colorScheme.secondary,
       foregroundColor: Theme.of(context).colorScheme.onSecondary,
       elevation: index == 2 ? 8 : 4,
-      child: const Icon(Icons.bed),
+      child: const Icon(Iconsax.moon5),
     ),
   ),
 );

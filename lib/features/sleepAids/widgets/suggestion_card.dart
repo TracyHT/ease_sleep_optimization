@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 
 class LargeSuggestionCard extends StatelessWidget {
   final VoidCallback? onTap;
@@ -16,7 +17,7 @@ class LargeSuggestionCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: const Center(
-          child: Icon(Icons.play_circle_fill, size: 48, color: Colors.white60),
+          child: Icon(Iconsax.play_circle5, size: 48, color: Colors.white60),
         ),
       ),
     );

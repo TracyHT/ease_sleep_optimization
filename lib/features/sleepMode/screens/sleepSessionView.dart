@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:flutter/scheduler.dart';
 
 class SleepSessionView extends StatefulWidget {
@@ -55,7 +56,7 @@ class _SleepSessionViewState extends State<SleepSessionView> {
             const SizedBox(height: 24),
 
             // Sleep icon placeholder
-            Icon(Icons.bedtime, size: 72, color: colorScheme.primary),
+            Icon(Iconsax.moon5, size: 72, color: colorScheme.primary),
 
             const SizedBox(height: 8),
             Text("Alarm active in 7h30 min"),
@@ -156,7 +157,7 @@ class _SleepSessionViewState extends State<SleepSessionView> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.radio_button_checked, size: 16, color: Colors.grey),
+          const Icon(Iconsax.record_circle5, size: 16, color: Colors.grey),
           const SizedBox(width: 8),
           Expanded(
             child: Column(

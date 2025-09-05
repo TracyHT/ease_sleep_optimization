@@ -28,14 +28,27 @@ app.get("/test", (req, res) => {
 app.get("/api/sleep-sounds", async (req, res) => {
   try {
     const { category, isPremium, isActive = true } = req.query;
+    console.log('Query params:', { category, isPremium, isActive });
+    
     const filter = { isActive: isActive === 'true' };
+    console.log('Filter:', filter);
     
     if (category) filter.category = category;
     if (isPremium !== undefined) filter.isPremium = isPremium === 'true';
     
+    console.log('Final filter:', filter);
+    
     const sounds = await SleepSound.find(filter)
       .sort({ popularity: -1, createdAt: -1 })
       .select('-__v');
+    
+    console.log('Found sounds:', sounds.length);
+    if (sounds.length === 0) {
+      // Try finding all documents without filter
+      const allSounds = await SleepSound.find({});
+      console.log('All sounds in DB:', allSounds.length);
+      console.log('Sample document:', allSounds[0]);
+    }
     
     res.status(200).json({
       success: true,
@@ -43,6 +56,7 @@ app.get("/api/sleep-sounds", async (req, res) => {
       data: sounds
     });
   } catch (error) {
+    console.error('Error in sleep-sounds route:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

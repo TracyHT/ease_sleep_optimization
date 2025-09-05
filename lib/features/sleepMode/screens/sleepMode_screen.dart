@@ -1,6 +1,8 @@
 import 'package:ease_sleep_optimization/features/sleepMode/screens/sleepSessionView.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax/iconsax.dart';
+import '../../../ui/components/gradient_background.dart';
 
 class SleepModeScreen extends ConsumerStatefulWidget {
   const SleepModeScreen({super.key});
@@ -26,158 +28,155 @@ class _SleepModeScreenState extends ConsumerState<SleepModeScreen> {
     final textTheme = theme.textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(''),
-        backgroundColor: colorScheme.background,
-        elevation: 0,
-      ),
-      backgroundColor: colorScheme.surfaceVariant,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ListView(
-          children: [
-            const SizedBox(height: 12),
-            Text(
-              "It’s time for sleep",
-              style: textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+      body: GradientBackground(
+        primaryOpacity: 0.05,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: ListView(
+            children: [
+              const SizedBox(height: 12),
+              Text(
+                "It’s time for sleep",
+                style: textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              "Check your sleep settings and start your sleep session.",
-              textAlign: TextAlign.center,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            /// Alarm Settings Card
-            _buildCard(
-              title: "Alarm Settings",
-              trailing: TextButton(
-                onPressed: () {},
-                child: Text(
-                  "Edit >",
-                  style: textTheme.labelLarge?.copyWith(
-                    color: colorScheme.primary,
-                  ),
+              const SizedBox(height: 4),
+              Text(
+                "Check your sleep settings and start your sleep session.",
+                textAlign: TextAlign.center,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  DropdownButton<String>(
-                    value: selectedPreset,
-                    isExpanded: true,
-                    items:
-                        alarmPresets.map((preset) {
-                          return DropdownMenuItem<String>(
-                            value: preset,
-                            child: Text(
-                              preset,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+              const SizedBox(height: 24),
+
+              /// Alarm Settings Card
+              _buildCard(
+                title: "Alarm Settings",
+                trailing: TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    "Edit >",
+                    style: textTheme.labelLarge?.copyWith(
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DropdownButton<String>(
+                      value: selectedPreset,
+                      isExpanded: true,
+                      items:
+                          alarmPresets.map((preset) {
+                            return DropdownMenuItem<String>(
+                              value: preset,
+                              child: Text(
+                                preset,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          );
-                        }).toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => selectedPreset = value);
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 4),
+                            );
+                          }).toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => selectedPreset = value);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 4),
 
-                  const SizedBox(height: 4),
-                  const Text(
-                    "Alarm active in 7h30 min",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  const SizedBox(height: 12),
-                  SwitchListTile(
-                    title: const Text("Alarm Status"),
-                    value: isAlarmOn,
-                    onChanged: (value) {
-                      setState(() => isAlarmOn = value);
-                    },
-                  ),
-                  SwitchListTile(
-                    title: const Text("Snooze"),
-                    value: isSnoozeOn,
-                    onChanged: (value) {
-                      setState(() => isSnoozeOn = value);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            /// Pre-sleep Activities
-            _buildCard(
-              title: "Pre-sleep Activities",
-              child: Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                alignment: WrapAlignment.start,
-                children: [
-                  _activityIcon(Icons.no_drinks, "Alcohol", theme),
-                  _activityIcon(Icons.coffee, "Caffeine", theme),
-                  _activityIcon(Icons.fitness_center, "Workout", theme),
-                  _activityIcon(Icons.menu_book, "Read", theme),
-                  _activityIcon(Icons.self_improvement, "Meditation", theme),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            /// Connected Devices
-            _buildCard(
-              title: "Connected Devices",
-              child: Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  _deviceButton(Icons.light_mode, "Lights", theme),
-                  _deviceButton(Icons.spa, "Scent Diffuser", theme),
-                  _deviceButton(Icons.ac_unit, "Air Conditioner", theme),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            /// Buttons
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: colorScheme.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                    const SizedBox(height: 4),
+                    const Text(
+                      "Alarm active in 7h30 min",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                    const SizedBox(height: 12),
+                    SwitchListTile(
+                      title: const Text("Alarm Status"),
+                      value: isAlarmOn,
+                      onChanged: (value) {
+                        setState(() => isAlarmOn = value);
+                      },
+                    ),
+                    SwitchListTile(
+                      title: const Text("Snooze"),
+                      value: isSnoozeOn,
+                      onChanged: (value) {
+                        setState(() => isSnoozeOn = value);
+                      },
+                    ),
+                  ],
                 ),
               ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SleepSessionView()),
-                );
-              },
-              child: Text(
-                "Start Sleep Session",
-                style: textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onPrimary,
+              const SizedBox(height: 16),
+
+              /// Pre-sleep Activities
+              _buildCard(
+                title: "Pre-sleep Activities",
+                child: Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  alignment: WrapAlignment.start,
+                  children: [
+                    _activityIcon(Iconsax.danger5, "Alcohol", theme),
+                    _activityIcon(Iconsax.coffee5, "Caffeine", theme),
+                    _activityIcon(Iconsax.heart5, "Workout", theme),
+                    _activityIcon(Iconsax.book5, "Read", theme),
+                    _activityIcon(Iconsax.cloud5, "Meditation", theme),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            TextButton(
-              onPressed: () {},
-              child: Text("Cancel", style: textTheme.labelLarge),
-            ),
-            const SizedBox(height: 32),
-          ],
+              const SizedBox(height: 16),
+
+              /// Connected Devices
+              _buildCard(
+                title: "Connected Devices",
+                child: Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    _deviceButton(Iconsax.lamp5, "Lights", theme),
+                    _deviceButton(Iconsax.lovely5, "Scent Diffuser", theme),
+                    _deviceButton(Iconsax.wind_25, "Air Conditioner", theme),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              /// Buttons
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: colorScheme.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const SleepSessionView()),
+                  );
+                },
+                child: Text(
+                  "Start Sleep Session",
+                  style: textTheme.labelLarge?.copyWith(
+                    color: colorScheme.onPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () {},
+                child: Text("Cancel", style: textTheme.labelLarge),
+              ),
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );
