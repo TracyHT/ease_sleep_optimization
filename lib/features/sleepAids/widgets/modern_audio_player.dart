@@ -12,7 +12,7 @@ class ModernAudioPlayer extends ConsumerStatefulWidget {
   ConsumerState<ModernAudioPlayer> createState() => _ModernAudioPlayerState();
 }
 
-class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer> 
+class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -26,20 +26,12 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-    _slideAnimation = Tween<double>(
-      begin: 100.0,
-      end: 0.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+    _slideAnimation = Tween<double>(begin: 100.0, end: 0.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
+    );
     _animationController.forward();
   }
 
@@ -53,7 +45,7 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
   Widget build(BuildContext context) {
     final audioState = ref.watch(audioPlayerProvider);
     final audioNotifier = ref.read(audioPlayerProvider.notifier);
-    
+
     if (audioState.currentSound == null) {
       return const SizedBox.shrink();
     }
@@ -72,7 +64,12 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
     );
   }
 
-  Widget _buildPlayer(AudioPlayerState audioState, AudioPlayerNotifier audioNotifier) {
+  Widget _buildPlayer(
+    AudioPlayerState audioState,
+    AudioPlayerNotifier audioNotifier,
+  ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return GestureDetector(
       onVerticalDragEnd: (details) {
         if (details.velocity.pixelsPerSecond.dy > 300) {
@@ -84,7 +81,7 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOutCubic,
-        height: _isExpanded ? 320 : 160,
+        height: _isExpanded ? 380 : 160,
         child: Stack(
           children: [
             // Blurred background
@@ -100,8 +97,8 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Colors.white.withValues(alpha: 0.15),
-                        Colors.white.withValues(alpha: 0.05),
+                        colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                        colorScheme.surface.withValues(alpha: 0.1),
                       ],
                     ),
                     borderRadius: const BorderRadius.vertical(
@@ -117,7 +114,7 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
                 ),
               ),
             ),
-            
+
             // Content
             Column(
               children: [
@@ -131,142 +128,164 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                
+
                 // Main content
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    child: Column(
-                      children: [
-                        // Sound info row
-                        Row(
-                          children: [
-                            // Album art with animation
-                            Hero(
-                              tag: 'album-art-${audioState.currentSound!.id}',
-                              child: Container(
-                                width: _isExpanded ? 80 : 56,
-                                height: _isExpanded ? 80 : 56,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(_isExpanded ? 16 : 12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.3),
-                                      blurRadius: 12,
-                                      offset: const Offset(0, 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Sound info row
+                          Row(
+                            children: [
+                              // Album art with animation
+                              Hero(
+                                tag: 'album-art-${audioState.currentSound!.id}',
+                                child: Container(
+                                  width: _isExpanded ? 80 : 56,
+                                  height: _isExpanded ? 80 : 56,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                      _isExpanded ? 16 : 12,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(
+                                      _isExpanded ? 16 : 12,
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Image.asset(
+                                          audioState.currentSound!.imagePath ??
+                                              'lib/assets/images/placeholder.jpg',
+                                          width: _isExpanded ? 80 : 56,
+                                          height: _isExpanded ? 80 : 56,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                      gradient: LinearGradient(
+                                                        colors: [
+                                                          Colors
+                                                              .purple
+                                                              .shade400,
+                                                          Colors.blue.shade400,
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    child: const Icon(
+                                                      Iconsax.music5,
+                                                      color: Colors.white,
+                                                      size: 24,
+                                                    ),
+                                                  ),
+                                        ),
+                                        if (audioState.isPlaying)
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.black.withValues(
+                                                alpha: 0.3,
+                                              ),
+                                            ),
+                                            child: Center(
+                                              child: _buildPlayingIndicator(),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(width: 16),
+
+                              // Sound title and subtitle
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      audioState.currentSound!.title,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      audioState.currentSound!.subtitle,
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.7,
+                                        ),
+                                        fontSize: 13,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(_isExpanded ? 16 : 12),
-                                  child: Stack(
-                                    children: [
-                                      Image.asset(
-                                        audioState.currentSound!.imagePath ?? 'lib/assets/images/placeholder.jpg',
-                                        width: _isExpanded ? 80 : 56,
-                                        height: _isExpanded ? 80 : 56,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) => Container(
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Colors.purple.shade400,
-                                                Colors.blue.shade400,
-                                              ],
-                                            ),
-                                          ),
-                                          child: const Icon(
-                                            Iconsax.music5,
-                                            color: Colors.white,
-                                            size: 24,
-                                          ),
-                                        ),
-                                      ),
-                                      if (audioState.isPlaying)
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.black.withValues(alpha: 0.3),
-                                          ),
-                                          child: Center(
-                                            child: _buildPlayingIndicator(),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
                               ),
-                            ),
-                            
-                            const SizedBox(width: 16),
-                            
-                            // Sound title and subtitle
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    audioState.currentSound!.title,
-                                    style: const TextStyle(
+
+                              // Quick controls
+                              if (!_isExpanded) ...[
+                                IconButton(
+                                  onPressed:
+                                      () => audioNotifier.togglePlayPause(),
+                                  icon: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 200),
+                                    child: Icon(
+                                      audioState.isPlaying
+                                          ? Iconsax.pause5
+                                          : Iconsax.play5,
+                                      key: ValueKey(audioState.isPlaying),
                                       color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
+                                      size: 32,
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    audioState.currentSound!.subtitle,
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.7),
-                                      fontSize: 13,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            
-                            // Quick controls
-                            if (!_isExpanded) ...[
-                              IconButton(
-                                onPressed: () => audioNotifier.togglePlayPause(),
-                                icon: AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 200),
-                                  child: Icon(
-                                    audioState.isPlaying 
-                                      ? Iconsax.pause5 
-                                      : Iconsax.play5,
-                                    key: ValueKey(audioState.isPlaying),
-                                    color: Colors.white,
-                                    size: 32,
                                   ),
                                 ),
-                              ),
+                              ],
                             ],
+                          ),
+
+                          // Expanded controls
+                          if (_isExpanded) ...[
+                            const SizedBox(height: 24),
+
+                            // Progress bar
+                            _buildProgressBar(audioState, audioNotifier),
+
+                            const SizedBox(height: 24),
+
+                            // Playback controls
+                            _buildPlaybackControls(audioState, audioNotifier),
+
+                            const SizedBox(height: 20),
+
+                            // Volume control
+                            _buildVolumeControl(audioState, audioNotifier),
                           ],
-                        ),
-                        
-                        // Expanded controls
-                        if (_isExpanded) ...[
-                          const SizedBox(height: 24),
-                          
-                          // Progress bar
-                          _buildProgressBar(audioState, audioNotifier),
-                          
-                          const SizedBox(height: 24),
-                          
-                          // Playback controls
-                          _buildPlaybackControls(audioState, audioNotifier),
-                          
-                          const SizedBox(height: 20),
-                          
-                          // Volume control
-                          _buildVolumeControl(audioState, audioNotifier),
                         ],
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -297,11 +316,16 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
     );
   }
 
-  Widget _buildProgressBar(AudioPlayerState audioState, AudioPlayerNotifier audioNotifier) {
-    final progress = audioState.totalDuration.inMilliseconds > 0
-        ? audioState.currentPosition.inMilliseconds / audioState.totalDuration.inMilliseconds
-        : 0.0;
-    
+  Widget _buildProgressBar(
+    AudioPlayerState audioState,
+    AudioPlayerNotifier audioNotifier,
+  ) {
+    final progress =
+        audioState.totalDuration.inMilliseconds > 0
+            ? audioState.currentPosition.inMilliseconds /
+                audioState.totalDuration.inMilliseconds
+            : 0.0;
+
     return Column(
       children: [
         SliderTheme(
@@ -318,7 +342,8 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
             value: progress.clamp(0.0, 1.0),
             onChanged: (value) {
               final newPosition = Duration(
-                milliseconds: (value * audioState.totalDuration.inMilliseconds).round(),
+                milliseconds:
+                    (value * audioState.totalDuration.inMilliseconds).round(),
               );
               audioNotifier.seek(newPosition);
             },
@@ -350,7 +375,10 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
     );
   }
 
-  Widget _buildPlaybackControls(AudioPlayerState audioState, AudioPlayerNotifier audioNotifier) {
+  Widget _buildPlaybackControls(
+    AudioPlayerState audioState,
+    AudioPlayerNotifier audioNotifier,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -361,15 +389,16 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
           },
           icon: Icon(
             Iconsax.repeat5,
-            color: audioState.currentSound?.isLooping == true 
-              ? Colors.white 
-              : Colors.white.withValues(alpha: 0.3),
+            color:
+                audioState.currentSound?.isLooping == true
+                    ? Colors.white
+                    : Colors.white.withValues(alpha: 0.3),
             size: 24,
           ),
         ),
-        
+
         const SizedBox(width: 24),
-        
+
         // Play/Pause button
         Container(
           width: 64,
@@ -394,29 +423,30 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
             onPressed: () => audioNotifier.togglePlayPause(),
             icon: AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
-              child: audioState.isLoading
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : Icon(
-                    audioState.isPlaying 
-                      ? Iconsax.pause5 
-                      : Iconsax.play5,
-                    key: ValueKey(audioState.isPlaying),
-                    color: Colors.white,
-                    size: 32,
-                  ),
+              child:
+                  audioState.isLoading
+                      ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        ),
+                      )
+                      : Icon(
+                        audioState.isPlaying ? Iconsax.pause5 : Iconsax.play5,
+                        key: ValueKey(audioState.isPlaying),
+                        color: Colors.white,
+                        size: 32,
+                      ),
             ),
           ),
         ),
-        
+
         const SizedBox(width: 24),
-        
+
         // Stop button
         IconButton(
           onPressed: () => audioNotifier.stop(),
@@ -430,7 +460,10 @@ class _ModernAudioPlayerState extends ConsumerState<ModernAudioPlayer>
     );
   }
 
-  Widget _buildVolumeControl(AudioPlayerState audioState, AudioPlayerNotifier audioNotifier) {
+  Widget _buildVolumeControl(
+    AudioPlayerState audioState,
+    AudioPlayerNotifier audioNotifier,
+  ) {
     return Row(
       children: [
         Icon(
