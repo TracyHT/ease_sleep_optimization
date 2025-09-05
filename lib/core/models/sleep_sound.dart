@@ -22,6 +22,36 @@ class SleepSound {
     this.isPremium = false,
   });
 
+  /// Create SleepSound from JSON data (from API)
+  factory SleepSound.fromJson(Map<String, dynamic> json) {
+    return SleepSound(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      subtitle: json['subtitle'] as String,
+      category: json['category'] as String,
+      audioPath: json['audioPath'] as String,
+      imagePath: json['imagePath'] as String?,
+      duration: Duration(minutes: (json['duration'] as num).toInt()),
+      isLooping: json['isLooping'] as bool? ?? true,
+      isPremium: json['isPremium'] as bool? ?? false,
+    );
+  }
+
+  /// Convert SleepSound to JSON (for API)
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'subtitle': subtitle,
+      'category': category,
+      'audioPath': audioPath,
+      'imagePath': imagePath,
+      'duration': duration.inMinutes,
+      'isLooping': isLooping,
+      'isPremium': isPremium,
+    };
+  }
+
   SleepSound copyWith({
     String? id,
     String? title,

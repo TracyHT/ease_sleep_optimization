@@ -1,15 +1,31 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/sleep_sound.dart';
+import '../../../services/sleep_sounds_api_service.dart';
 
-/// Provider for sleep sounds data
-final sleepSoundsProvider = Provider<List<SleepSound>>((ref) {
-  return _getSampleSleepSounds();
+/// Provider for sleep sounds data from API
+final sleepSoundsProvider = FutureProvider<List<SleepSound>>((ref) async {
+  try {
+    // Try to load from API first
+    final sounds = await SleepSoundsApiService.getAllSleepSounds();
+    return sounds;
+  } catch (e) {
+    // Fallback to static data if API fails
+    print('Failed to load sounds from API, using fallback data: $e');
+    return _getSampleSleepSounds();
+  }
 });
 
 /// Provider for sounds filtered by category
-final soundsByCategoryProvider = Provider.family<List<SleepSound>, SoundCategory>((ref, category) {
-  final allSounds = ref.watch(sleepSoundsProvider);
-  return allSounds.where((sound) => sound.category == category.displayName).toList();
+final soundsByCategoryProvider = FutureProvider.family<List<SleepSound>, SoundCategory>((ref, category) async {
+  try {
+    // Load sounds from API with category filter
+    final sounds = await SleepSoundsApiService.getSoundsByCategory(category.displayName);
+    return sounds;
+  } catch (e) {
+    // Fallback: get all sounds and filter locally
+    final allSounds = await ref.watch(sleepSoundsProvider.future);
+    return allSounds.where((sound) => sound.category == category.displayName).toList();
+  }
 });
 
 /// Provider for recently played sounds

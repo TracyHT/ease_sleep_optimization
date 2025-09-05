@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/sleep_sound.dart';
 import '../../../services/audio_player_service.dart';
+import '../../../services/sleep_sounds_api_service.dart';
 
 /// Provider for the audio player service
 final audioPlayerServiceProvider = Provider<AudioPlayerService>((ref) {
@@ -41,6 +42,9 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
       state = state.copyWith(isLoading: true);
       
       await _audioService.playSound(sound);
+      
+      // Track play in database for analytics
+      SleepSoundsApiService.incrementPopularity(sound.id);
       
       _ref.read(currentSoundProvider.notifier).state = sound;
       _ref.read(isPlayingProvider.notifier).state = true;

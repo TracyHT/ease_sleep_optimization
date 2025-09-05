@@ -1,37 +1,20 @@
-import express from "express";
-import mongoose from "mongoose";
-import cors from "cors";
-import dotenv from "dotenv";
+import SleepSound from "../models/sleepSound.model.js";
 
-// Load routes
-import userRoutes from "./routes/userRoutes.js";
-// Import sleep sound model
-import SleepSound from "./models/sleepSound.model.js";
-// import controlRoutes from "./routes/controlRoutes.js";
-// import statisticRoutes from "./routes/statisticRoutes.js";
-
-// Load environment variables
-dotenv.config();
-
-const app = express();
-
-// Middleware
-app.use(express.json());
-app.use(cors());
-
-// Test route
-app.get("/test", (req, res) => {
-  res.json({ message: "Server is working!" });
-});
-
-// Sleep sounds routes
-app.get("/api/sleep-sounds", async (req, res) => {
+// Get all sleep sounds
+export const getAllSleepSounds = async (req, res) => {
   try {
     const { category, isPremium, isActive = true } = req.query;
+    
+    // Build filter object
     const filter = { isActive: isActive === 'true' };
     
-    if (category) filter.category = category;
-    if (isPremium !== undefined) filter.isPremium = isPremium === 'true';
+    if (category) {
+      filter.category = category;
+    }
+    
+    if (isPremium !== undefined) {
+      filter.isPremium = isPremium === 'true';
+    }
     
     const sounds = await SleepSound.find(filter)
       .sort({ popularity: -1, createdAt: -1 })
@@ -43,12 +26,227 @@ app.get("/api/sleep-sounds", async (req, res) => {
       data: sounds
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Error fetching sleep sounds:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching sleep sounds',
+      error: error.message
+    });
   }
-});
+};
 
-app.post("/api/sleep-sounds/initialize", async (req, res) => {
+// Get sleep sounds by category
+export const getSoundsByCategory = async (req, res) => {
   try {
+    const { category } = req.params;
+    const sounds = await SleepSound.find({ 
+      category: category, 
+      isActive: true 
+    })
+    .sort({ popularity: -1 })
+    .select('-__v');
+    
+    res.status(200).json({
+      success: true,
+      category: category,
+      count: sounds.length,
+      data: sounds
+    });
+  } catch (error) {
+    console.error('Error fetching sounds by category:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching sounds by category',
+      error: error.message
+    });
+  }
+};
+
+// Get a single sleep sound by ID
+export const getSleepSoundById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const sound = await SleepSound.findOne({ id: id, isActive: true }).select('-__v');
+    
+    if (!sound) {
+      return res.status(404).json({
+        success: false,
+        message: 'Sleep sound not found'
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      data: sound
+    });
+  } catch (error) {
+    console.error('Error fetching sleep sound:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching sleep sound',
+      error: error.message
+    });
+  }
+};
+
+// Create a new sleep sound
+export const createSleepSound = async (req, res) => {
+  try {
+    const soundData = req.body;
+    
+    // Check if sound with same ID already exists
+    const existingSound = await SleepSound.findOne({ id: soundData.id });
+    if (existingSound) {
+      return res.status(400).json({
+        success: false,
+        message: 'Sleep sound with this ID already exists'
+      });
+    }
+    
+    const newSound = new SleepSound(soundData);
+    const savedSound = await newSound.save();
+    
+    res.status(201).json({
+      success: true,
+      message: 'Sleep sound created successfully',
+      data: savedSound
+    });
+  } catch (error) {
+    console.error('Error creating sleep sound:', error);
+    res.status(400).json({
+      success: false,
+      message: 'Error creating sleep sound',
+      error: error.message
+    });
+  }
+};
+
+// Update a sleep sound
+export const updateSleepSound = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    const updatedSound = await SleepSound.findOneAndUpdate(
+      { id: id },
+      { ...updateData, updatedAt: Date.now() },
+      { new: true, runValidators: true }
+    ).select('-__v');
+    
+    if (!updatedSound) {
+      return res.status(404).json({
+        success: false,
+        message: 'Sleep sound not found'
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      message: 'Sleep sound updated successfully',
+      data: updatedSound
+    });
+  } catch (error) {
+    console.error('Error updating sleep sound:', error);
+    res.status(400).json({
+      success: false,
+      message: 'Error updating sleep sound',
+      error: error.message
+    });
+  }
+};
+
+// Delete a sleep sound (soft delete by setting isActive to false)
+export const deleteSleepSound = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const deletedSound = await SleepSound.findOneAndUpdate(
+      { id: id },
+      { isActive: false, updatedAt: Date.now() },
+      { new: true }
+    );
+    
+    if (!deletedSound) {
+      return res.status(404).json({
+        success: false,
+        message: 'Sleep sound not found'
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      message: 'Sleep sound deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting sleep sound:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting sleep sound',
+      error: error.message
+    });
+  }
+};
+
+// Increment popularity (when a sound is played)
+export const incrementPopularity = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const sound = await SleepSound.findOneAndUpdate(
+      { id: id, isActive: true },
+      { $inc: { popularity: 1 }, updatedAt: Date.now() },
+      { new: true }
+    ).select('-__v');
+    
+    if (!sound) {
+      return res.status(404).json({
+        success: false,
+        message: 'Sleep sound not found'
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      message: 'Popularity updated successfully',
+      data: sound
+    });
+  } catch (error) {
+    console.error('Error updating popularity:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating popularity',
+      error: error.message
+    });
+  }
+};
+
+// Get popular sounds (top 10)
+export const getPopularSounds = async (req, res) => {
+  try {
+    const sounds = await SleepSound.find({ isActive: true })
+      .sort({ popularity: -1 })
+      .limit(10)
+      .select('-__v');
+    
+    res.status(200).json({
+      success: true,
+      count: sounds.length,
+      data: sounds
+    });
+  } catch (error) {
+    console.error('Error fetching popular sounds:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching popular sounds',
+      error: error.message
+    });
+  }
+};
+
+// Initialize default sounds (for seeding the database)
+export const initializeDefaultSounds = async (req, res) => {
+  try {
+    // Check if sounds already exist
     const existingSounds = await SleepSound.countDocuments();
     if (existingSounds > 0) {
       return res.status(200).json({
@@ -58,6 +256,7 @@ app.post("/api/sleep-sounds/initialize", async (req, res) => {
       });
     }
     
+    // Default sounds data
     const defaultSounds = [
       {
         id: "rain_heavy",
@@ -271,7 +470,9 @@ app.post("/api/sleep-sounds/initialize", async (req, res) => {
       }
     ];
     
+    // Insert default sounds
     const insertedSounds = await SleepSound.insertMany(defaultSounds);
+    
     res.status(201).json({
       success: true,
       message: 'Default sounds initialized successfully',
@@ -279,35 +480,11 @@ app.post("/api/sleep-sounds/initialize", async (req, res) => {
       data: insertedSounds
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// Routes
-app.use("/api/users", userRoutes);
-// app.use("/api/controls", controlRoutes);
-// app.use("/api/statistics", statisticRoutes);
-
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: "Something went wrong!" });
-});
-
-// MongoDB connection
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("MongoDB connected");
-    const PORT = process.env.PORT || 3000; // Fallback to 3000 if PORT is not set
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+    console.error('Error initializing default sounds:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error initializing default sounds',
+      error: error.message
     });
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err);
-    process.exit(1); // Exit process if MongoDB connection fails
-  });
+  }
+};
