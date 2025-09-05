@@ -8,6 +8,14 @@ import '../../../core/providers/user_provider.dart';
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
+  Future<void> handleLogout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Logged out')));
+  }
+
   @override
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
