@@ -13,8 +13,13 @@ class AppTheme {
 
     textTheme: TextTheme(
       displayLarge: AppTextStyles.displayLarge,
+      displayMedium: AppTextStyles.displayMedium,
+      displaySmall: AppTextStyles.displaySmall,
+      headlineLarge: AppTextStyles.headlineLarge,
       headlineMedium: AppTextStyles.headlineMedium,
+      headlineSmall: AppTextStyles.headlineSmall,
       titleLarge: AppTextStyles.titleLarge,
+      titleMedium: AppTextStyles.titleMedium,
       bodyLarge: AppTextStyles.bodyLarge,
       bodyMedium: AppTextStyles.bodyMedium,
       labelLarge: AppTextStyles.labelLarge,
@@ -57,10 +62,15 @@ class AppTheme {
 
     textTheme: TextTheme(
       displayLarge: AppTextStyles.displayLarge.copyWith(color: AppColors.white),
+      displayMedium: AppTextStyles.displayMedium.copyWith(color: AppColors.white),
+      displaySmall: AppTextStyles.displaySmall.copyWith(color: AppColors.white),
+      headlineLarge: AppTextStyles.headlineLarge.copyWith(color: AppColors.white),
       headlineMedium: AppTextStyles.headlineMedium.copyWith(
         color: AppColors.white,
       ),
+      headlineSmall: AppTextStyles.headlineSmall.copyWith(color: AppColors.white),
       titleLarge: AppTextStyles.titleLarge.copyWith(color: AppColors.white),
+      titleMedium: AppTextStyles.titleMedium.copyWith(color: AppColors.white),
       bodyLarge: AppTextStyles.bodyLarge.copyWith(color: AppColors.white),
       bodyMedium: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
       labelLarge: AppTextStyles.labelLarge.copyWith(color: AppColors.white),

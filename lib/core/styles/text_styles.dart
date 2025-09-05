@@ -7,6 +7,7 @@ class AppTextStyles {
     fontWeight: FontWeight.w400,
     letterSpacing: -0.25,
     color: AppColors.neutral900,
+    fontFamily: 'Montserrat',
   );
 
   static const TextStyle displayMedium = TextStyle(
@@ -14,6 +15,15 @@ class AppTextStyles {
     fontWeight: FontWeight.w400,
     letterSpacing: 0,
     color: AppColors.neutral900,
+    fontFamily: 'Montserrat',
+  );
+
+  static const TextStyle displaySmall = TextStyle(
+    fontSize: 36,
+    fontWeight: FontWeight.w400,
+    letterSpacing: 0,
+    color: AppColors.neutral900,
+    fontFamily: 'Montserrat',
   );
 
   static const TextStyle headlineLarge = TextStyle(
@@ -21,13 +31,23 @@ class AppTextStyles {
     fontWeight: FontWeight.w400,
     letterSpacing: 0,
     color: AppColors.neutral900,
+    fontFamily: 'Montserrat',
   );
 
   static const TextStyle headlineMedium = TextStyle(
     fontSize: 28,
-    fontWeight: FontWeight.w400,
+    fontWeight: FontWeight.w600,
     letterSpacing: 0,
     color: AppColors.neutral900,
+    fontFamily: 'Montserrat',
+  );
+
+  static const TextStyle headlineSmall = TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 0,
+    color: AppColors.neutral900,
+    fontFamily: 'Montserrat',
   );
 
   static const TextStyle titleLarge = TextStyle(
@@ -35,6 +55,7 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     letterSpacing: 0,
     color: AppColors.neutral900,
+    fontFamily: 'Montserrat',
   );
 
   static const TextStyle titleMedium = TextStyle(
@@ -42,6 +63,7 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     letterSpacing: 0.15,
     color: AppColors.neutral900,
+    fontFamily: 'Montserrat',
   );
 
   static const TextStyle bodyLarge = TextStyle(
@@ -49,6 +71,7 @@ class AppTextStyles {
     fontWeight: FontWeight.w400,
     letterSpacing: 0.5,
     color: AppColors.neutral900,
+    fontFamily: 'Montserrat',
   );
 
   static const TextStyle bodyMedium = TextStyle(
@@ -56,6 +79,7 @@ class AppTextStyles {
     fontWeight: FontWeight.w400,
     letterSpacing: 0.25,
     color: AppColors.neutral900,
+    fontFamily: 'Montserrat',
   );
 
   static const TextStyle labelLarge = TextStyle(
@@ -63,6 +87,7 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     letterSpacing: 0.1,
     color: AppColors.neutral900,
+    fontFamily: 'Montserrat',
   );
 
   static const TextStyle labelMedium = TextStyle(
@@ -70,5 +95,6 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     letterSpacing: 0.5,
     color: AppColors.neutral900,
+    fontFamily: 'Montserrat',
   );
 }
