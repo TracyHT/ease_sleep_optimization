@@ -54,21 +54,31 @@ class AppTheme {
       onSecondary: AppColors.neutral100,
       error: Colors.red,
       onError: Colors.black,
-      surface: Color(0xFF121212),
+      surface: Color.fromARGB(255, 5, 1, 50),
+      surfaceContainer: Color(0xFF1E1E1E),
+      surfaceContainerHigh: Color(0xFF262626),
+      surfaceContainerHighest: Color.fromARGB(255, 9, 5, 58),
       onSurface: Colors.white,
+      outline: AppColors.neutral300,
     ),
     scaffoldBackgroundColor: AppColors.darkBackground,
     inputDecorationTheme: AppInputStyles.inputDecorationThemeDark,
 
     textTheme: TextTheme(
       displayLarge: AppTextStyles.displayLarge.copyWith(color: AppColors.white),
-      displayMedium: AppTextStyles.displayMedium.copyWith(color: AppColors.white),
+      displayMedium: AppTextStyles.displayMedium.copyWith(
+        color: AppColors.white,
+      ),
       displaySmall: AppTextStyles.displaySmall.copyWith(color: AppColors.white),
-      headlineLarge: AppTextStyles.headlineLarge.copyWith(color: AppColors.white),
+      headlineLarge: AppTextStyles.headlineLarge.copyWith(
+        color: AppColors.white,
+      ),
       headlineMedium: AppTextStyles.headlineMedium.copyWith(
         color: AppColors.white,
       ),
-      headlineSmall: AppTextStyles.headlineSmall.copyWith(color: AppColors.white),
+      headlineSmall: AppTextStyles.headlineSmall.copyWith(
+        color: AppColors.white,
+      ),
       titleLarge: AppTextStyles.titleLarge.copyWith(color: AppColors.white),
       titleMedium: AppTextStyles.titleMedium.copyWith(color: AppColors.white),
       bodyLarge: AppTextStyles.bodyLarge.copyWith(color: AppColors.white),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:iconsax/iconsax.dart';
 import '../../../core/constants/app_spacings.dart';
 import '../widgets/date_picker_widget.dart';
 import '../widgets/sleep_summary_widget.dart';
@@ -10,6 +11,7 @@ import '../providers/selected_date_provider.dart';
 import '../../../services/statistics_data_service.dart';
 import '../../../services/local_database_service.dart';
 import '../../../ui/components/section_heading.dart';
+import '../../../ui/components/gradient_background.dart';
 
 class StatisticsScreen extends ConsumerWidget {
   const StatisticsScreen({super.key});
@@ -22,105 +24,110 @@ class StatisticsScreen extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.only(
-            top: MediaQuery.of(context).padding.top,
-            left: AppSpacing.screenEdgePadding.left,
-            right: AppSpacing.screenEdgePadding.right,
-            bottom: AppSpacing.screenEdgePadding.bottom,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Statistics',
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+      body: GradientBackground(
+        primaryOpacity: 0.05,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top,
+              left: AppSpacing.screenEdgePadding.left,
+              right: AppSpacing.screenEdgePadding.right,
+              bottom: AppSpacing.screenEdgePadding.bottom,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Statistics',
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      // Refresh all data
-                      ref.invalidate(sleepDataProvider);
-                    },
-                    icon: Icon(
-                      Icons.refresh,
-                      color: colorScheme.primary,
+                    IconButton(
+                      onPressed: () {
+                        // Refresh all data
+                        ref.invalidate(sleepDataProvider);
+                      },
+                      icon: Icon(Iconsax.refresh5, color: colorScheme.primary),
+                      tooltip: 'Refresh data',
                     ),
-                    tooltip: 'Refresh data',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              SectionHeading(
-                title: "Today",
-                nav: "Trend",
-                onTap: () {
-                  // Navigate to detailed statistics screen
-                },
-              ),
-
-              const DatePickerWidget(),
-
-              SizedBox(height: screenHeight * 0.03),
-
-              sleepDataAsync.when(
-                data: (data) {
-                  if (data == null) {
-                    return _buildNoDataWidget(context, ref);
-                  }
-                  return SleepSummaryWidget(data: data);
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Text(
-                  'Error loading data: $e',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.error,
-                  ),
+                  ],
                 ),
-              ),
+                const SizedBox(height: 12),
+                SectionHeading(
+                  title: "Today",
+                  nav: "Trend",
+                  onTap: () {
+                    // Navigate to detailed statistics screen
+                  },
+                ),
 
-              const SizedBox(height: 24),
+                const DatePickerWidget(),
 
-              Consumer(
-                builder: (context, ref, child) {
-                  final selectedDate = ref.watch(selectedDateProvider);
-                  return FutureBuilder<Widget>(
-                    future: _buildSleepStageChart(selectedDate),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      return snapshot.data ?? SleepStageChartWidget.mock();
-                    },
-                  );
-                },
-              ),
+                SizedBox(height: screenHeight * 0.03),
 
-              const SizedBox(height: 32),
+                sleepDataAsync.when(
+                  data: (data) {
+                    if (data == null) {
+                      return _buildNoDataWidget(context, ref);
+                    }
+                    return SleepSummaryWidget(data: data);
+                  },
+                  loading:
+                      () => const Center(child: CircularProgressIndicator()),
+                  error:
+                      (e, _) => Text(
+                        'Error loading data: $e',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.error,
+                        ),
+                      ),
+                ),
 
-              Consumer(
-                builder: (context, ref, child) {
-                  final selectedDate = ref.watch(selectedDateProvider);
-                  return FutureBuilder<List<Map<String, dynamic>>>(
-                    future: _getEnvironmentalTimeline(selectedDate),
-                    builder: (context, snapshot) {
-                      return _buildTimelineSection(
-                        context,
-                        snapshot.data ?? [],
-                        snapshot.connectionState == ConnectionState.waiting,
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
+                const SizedBox(height: 24),
+
+                Consumer(
+                  builder: (context, ref, child) {
+                    final selectedDate = ref.watch(selectedDateProvider);
+                    return FutureBuilder<Widget>(
+                      future: _buildSleepStageChart(selectedDate),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        return snapshot.data ?? SleepStageChartWidget.mock();
+                      },
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 32),
+
+                Consumer(
+                  builder: (context, ref, child) {
+                    final selectedDate = ref.watch(selectedDateProvider);
+                    return FutureBuilder<List<Map<String, dynamic>>>(
+                      future: _getEnvironmentalTimeline(selectedDate),
+                      builder: (context, snapshot) {
+                        return _buildTimelineSection(
+                          context,
+                          snapshot.data ?? [],
+                          snapshot.connectionState == ConnectionState.waiting,
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -130,7 +137,7 @@ class StatisticsScreen extends ConsumerWidget {
   Widget _buildNoDataWidget(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Card(
       color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       child: Padding(
@@ -138,7 +145,7 @@ class StatisticsScreen extends ConsumerWidget {
         child: Column(
           children: [
             Icon(
-              Icons.bedtime_outlined,
+              Iconsax.moon5,
               size: 48,
               color: colorScheme.onSurface.withValues(alpha: 0.6),
             ),
@@ -167,7 +174,7 @@ class StatisticsScreen extends ConsumerWidget {
                     onPressed: () {
                       Navigator.pushNamed(context, '/database-test');
                     },
-                    icon: const Icon(Icons.science),
+                    icon: const Icon(Iconsax.candle_25),
                     label: const Text('Generate Data'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,
@@ -183,7 +190,7 @@ class StatisticsScreen extends ConsumerWidget {
                       // Force refresh by invalidating the provider
                       ref.invalidate(sleepDataProvider);
                     },
-                    icon: const Icon(Icons.refresh),
+                    icon: const Icon(Iconsax.refresh5),
                     label: const Text('Refresh'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.secondary,
@@ -207,13 +214,15 @@ class StatisticsScreen extends ConsumerWidget {
 
     try {
       // Get sleep sessions for the selected date
-      final sessions = LocalDatabaseService.getUserSleepSessions(currentUser.uid)
-          .where((session) {
-        final startTime = DateTime.parse(session['startTime'] ?? '');
-        return startTime.year == selectedDate.year &&
-               startTime.month == selectedDate.month &&
-               startTime.day == selectedDate.day;
-      }).toList();
+      final sessions =
+          LocalDatabaseService.getUserSleepSessions(currentUser.uid).where((
+            session,
+          ) {
+            final startTime = DateTime.parse(session['startTime'] ?? '');
+            return startTime.year == selectedDate.year &&
+                startTime.month == selectedDate.month &&
+                startTime.day == selectedDate.day;
+          }).toList();
 
       if (sessions.isEmpty) {
         return SleepStageChartWidget.mock();
@@ -239,26 +248,30 @@ class StatisticsScreen extends ConsumerWidget {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _getEnvironmentalTimeline(DateTime selectedDate) async {
+  Future<List<Map<String, dynamic>>> _getEnvironmentalTimeline(
+    DateTime selectedDate,
+  ) async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) return [];
 
     try {
       // Get sleep sessions for the selected date
-      final sessions = LocalDatabaseService.getUserSleepSessions(currentUser.uid)
-          .where((session) {
-        final startTime = DateTime.parse(session['startTime'] ?? '');
-        return startTime.year == selectedDate.year &&
-               startTime.month == selectedDate.month &&
-               startTime.day == selectedDate.day;
-      }).toList();
+      final sessions =
+          LocalDatabaseService.getUserSleepSessions(currentUser.uid).where((
+            session,
+          ) {
+            final startTime = DateTime.parse(session['startTime'] ?? '');
+            return startTime.year == selectedDate.year &&
+                startTime.month == selectedDate.month &&
+                startTime.day == selectedDate.day;
+          }).toList();
 
       if (sessions.isEmpty) return [];
 
       // Get timeline for the main session
       final mainSession = sessions.first;
       final sessionId = mainSession['sessionId'] as int;
-      
+
       return StatisticsDataService.getEnvironmentalTimeline(sessionId);
     } catch (e) {
       print('Error getting environmental timeline: $e');
@@ -284,7 +297,7 @@ class StatisticsScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
-        
+
         if (isLoading)
           const Center(child: CircularProgressIndicator())
         else if (timeline.isEmpty)
@@ -294,10 +307,7 @@ class StatisticsScreen extends ConsumerWidget {
               padding: AppSpacing.mediumPadding,
               child: Row(
                 children: [
-                  Icon(
-                    Icons.eco,
-                    color: colorScheme.primary,
-                  ),
+                  Icon(Iconsax.tree5, color: colorScheme.primary),
                   const SizedBox(width: AppSpacing.medium),
                   Expanded(
                     child: Text(
@@ -317,21 +327,23 @@ class StatisticsScreen extends ConsumerWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            color: colorScheme.surfaceContainerHighest,
+            color: colorScheme.primary.withValues(alpha: 0.2),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
-                children: timeline.map((event) {
-                  final eventTime = event['time'] as DateTime;
-                  final timeString = '${eventTime.hour.toString().padLeft(2, '0')}:${eventTime.minute.toString().padLeft(2, '0')}';
-                  
-                  return _timelineItem(
-                    context,
-                    timeString,
-                    event['event'] ?? 'Unknown event',
-                    event['description'] ?? '',
-                  );
-                }).toList(),
+                children:
+                    timeline.map((event) {
+                      final eventTime = event['time'] as DateTime;
+                      final timeString =
+                          '${eventTime.hour.toString().padLeft(2, '0')}:${eventTime.minute.toString().padLeft(2, '0')}';
+
+                      return _timelineItem(
+                        context,
+                        timeString,
+                        event['event'] ?? 'Unknown event',
+                        event['description'] ?? '',
+                      );
+                    }).toList(),
               ),
             ),
           ),
@@ -353,11 +365,7 @@ class StatisticsScreen extends ConsumerWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.radio_button_checked,
-            size: 18,
-            color: colorScheme.primary,
-          ),
+          Icon(Iconsax.record_circle5, size: 18, color: colorScheme.primary),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

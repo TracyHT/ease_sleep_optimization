@@ -1,6 +1,12 @@
+import 'package:ease_sleep_optimization/core/constants/app_spacings.dart';
 import 'package:ease_sleep_optimization/features/sleepMode/screens/sleepSessionView.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax/iconsax.dart';
+import '../../../ui/components/gradient_background.dart';
+import '../../../core/models/alarm.dart';
+import '../../control/providers/alarm_provider.dart';
+import '../../control/screens/alarm_list_screen.dart';
 
 class SleepModeScreen extends ConsumerStatefulWidget {
   const SleepModeScreen({super.key});
@@ -10,14 +16,16 @@ class SleepModeScreen extends ConsumerStatefulWidget {
 }
 
 class _SleepModeScreenState extends ConsumerState<SleepModeScreen> {
-  bool isAlarmOn = true;
-  bool isSnoozeOn = false;
-  final List<String> alarmPresets = [
-    'Workday Wake: 07:00AM',
-    'Weekend Chill: 09:00AM',
-    'Custom',
-  ];
-  String selectedPreset = 'Workday Wake: 07:00AM';
+  String? selectedAlarmId;
+  
+  @override
+  void initState() {
+    super.initState();
+    // Initialize default alarms if needed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(alarmsProvider.notifier).initializeDefaultAlarms();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,158 +34,242 @@ class _SleepModeScreenState extends ConsumerState<SleepModeScreen> {
     final textTheme = theme.textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(''),
-        backgroundColor: colorScheme.background,
-        elevation: 0,
-      ),
-      backgroundColor: colorScheme.surfaceVariant,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ListView(
-          children: [
-            const SizedBox(height: 12),
-            Text(
-              "It’s time for sleep",
-              style: textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+      body: GradientBackground(
+        primaryOpacity: 0.05,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: ListView(
+            children: [
+              const SizedBox(height: 12),
+              Text(
+                "It’s time for sleep",
+                style: textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.left,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              "Check your sleep settings and start your sleep session.",
-              textAlign: TextAlign.center,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            /// Alarm Settings Card
-            _buildCard(
-              title: "Alarm Settings",
-              trailing: TextButton(
-                onPressed: () {},
-                child: Text(
-                  "Edit >",
-                  style: textTheme.labelLarge?.copyWith(
-                    color: colorScheme.primary,
-                  ),
+              const SizedBox(height: 4),
+              Text(
+                "Check your sleep settings and start your sleep session.",
+                textAlign: TextAlign.left,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  DropdownButton<String>(
-                    value: selectedPreset,
-                    isExpanded: true,
-                    items:
-                        alarmPresets.map((preset) {
-                          return DropdownMenuItem<String>(
-                            value: preset,
-                            child: Text(
-                              preset,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+              const SizedBox(height: 24),
+
+              /// Alarm Settings Card
+              _buildCard(
+                title: "Alarm Settings",
+                trailing: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AlarmListScreen(),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    "Edit >",
+                    style: textTheme.labelLarge?.copyWith(
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                ),
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    final alarms = ref.watch(alarmsProvider);
+                    final activeAlarms = alarms.where((alarm) => alarm.isActive).toList();
+                    final selectedAlarm = selectedAlarmId != null 
+                        ? alarms.firstWhere(
+                            (alarm) => alarm.id == selectedAlarmId,
+                            orElse: () => activeAlarms.isNotEmpty ? activeAlarms.first : alarms.first,
+                          )
+                        : (activeAlarms.isNotEmpty ? activeAlarms.first : alarms.first);
+                    
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (alarms.isNotEmpty) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.1),
+                                width: 1,
                               ),
                             ),
-                          );
-                        }).toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => selectedPreset = value);
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 4),
-
-                  const SizedBox(height: 4),
-                  const Text(
-                    "Alarm active in 7h30 min",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  const SizedBox(height: 12),
-                  SwitchListTile(
-                    title: const Text("Alarm Status"),
-                    value: isAlarmOn,
-                    onChanged: (value) {
-                      setState(() => isAlarmOn = value);
-                    },
-                  ),
-                  SwitchListTile(
-                    title: const Text("Snooze"),
-                    value: isSnoozeOn,
-                    onChanged: (value) {
-                      setState(() => isSnoozeOn = value);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            /// Pre-sleep Activities
-            _buildCard(
-              title: "Pre-sleep Activities",
-              child: Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                alignment: WrapAlignment.start,
-                children: [
-                  _activityIcon(Icons.no_drinks, "Alcohol", theme),
-                  _activityIcon(Icons.coffee, "Caffeine", theme),
-                  _activityIcon(Icons.fitness_center, "Workout", theme),
-                  _activityIcon(Icons.menu_book, "Read", theme),
-                  _activityIcon(Icons.self_improvement, "Meditation", theme),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            /// Connected Devices
-            _buildCard(
-              title: "Connected Devices",
-              child: Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  _deviceButton(Icons.light_mode, "Lights", theme),
-                  _deviceButton(Icons.spa, "Scent Diffuser", theme),
-                  _deviceButton(Icons.ac_unit, "Air Conditioner", theme),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            /// Buttons
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: colorScheme.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                            child: DropdownButton<String>(
+                              value: selectedAlarmId ?? selectedAlarm.id,
+                              isExpanded: true,
+                              underline: const SizedBox(),
+                              dropdownColor: const Color(0xFF1E1E1E),
+                              items: alarms.map((alarm) {
+                                return DropdownMenuItem<String>(
+                                  value: alarm.id,
+                                  child: Text(
+                                    "${alarm.label} (${alarm.time})",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() => selectedAlarmId = value);
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            _getAlarmTimeUntilText(selectedAlarm),
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                          const SizedBox(height: 12),
+                          SwitchListTile(
+                            title: const Text(
+                              "Alarm Status",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            value: selectedAlarm.isActive,
+                            activeColor: colorScheme.primary,
+                            onChanged: (value) {
+                              ref.read(alarmsProvider.notifier).toggleAlarmStatus(selectedAlarm.id);
+                            },
+                          ),
+                          SwitchListTile(
+                            title: const Text(
+                              "Snooze",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            value: selectedAlarm.snoozeEnabled,
+                            activeColor: colorScheme.primary,
+                            onChanged: (value) {
+                              final updatedAlarm = Alarm(
+                                id: selectedAlarm.id,
+                                time: selectedAlarm.time,
+                                label: selectedAlarm.label,
+                                sound: selectedAlarm.sound,
+                                snoozeEnabled: value,
+                                snoozeDuration: selectedAlarm.snoozeDuration,
+                                alarmType: selectedAlarm.alarmType,
+                                repeatDays: selectedAlarm.repeatDays,
+                                createdAt: selectedAlarm.createdAt,
+                                updatedAt: DateTime.now(),
+                                isActive: selectedAlarm.isActive,
+                              );
+                              ref.read(alarmsProvider.notifier).updateAlarm(updatedAlarm);
+                            },
+                          ),
+                        ] else ...[
+                          Center(
+                            child: Column(
+                              children: [
+                                Text(
+                                  "No alarms set",
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const AlarmListScreen(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    "Add Alarm",
+                                    style: TextStyle(color: colorScheme.primary),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    );
+                  },
                 ),
               ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SleepSessionView()),
-                );
-              },
-              child: Text(
-                "Start Sleep Session",
-                style: textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onPrimary,
+              const SizedBox(height: 16),
+
+              /// Pre-sleep Activities
+              _buildCard(
+                title: "Pre-sleep Activities",
+                child: Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  alignment: WrapAlignment.start,
+                  children: [
+                    _activityIcon(Iconsax.danger5, "Alcohol", theme),
+                    _activityIcon(Iconsax.coffee5, "Caffeine", theme),
+                    _activityIcon(Iconsax.heart5, "Workout", theme),
+                    _activityIcon(Iconsax.book5, "Read", theme),
+                    _activityIcon(Iconsax.cloud5, "Meditation", theme),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            TextButton(
-              onPressed: () {},
-              child: Text("Cancel", style: textTheme.labelLarge),
-            ),
-            const SizedBox(height: 32),
-          ],
+              const SizedBox(height: 16),
+
+              /// Connected Devices
+              _buildCard(
+                title: "Connected Devices",
+                child: Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    _deviceButton(Iconsax.lamp5, "Lights", theme),
+                    _deviceButton(Iconsax.lovely5, "Scent Diffuser", theme),
+                    _deviceButton(Iconsax.wind_25, "Air Conditioner", theme),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              /// Buttons
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  minimumSize: const Size.fromHeight(50),
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const SleepSessionView()),
+                  );
+                },
+                child: const Text(
+                  "Start Sleep Session",
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xLarge),
+            ],
+          ),
         ),
       ),
     );
@@ -189,21 +281,17 @@ class _SleepModeScreenState extends ConsumerState<SleepModeScreen> {
     required Widget child,
   }) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: Colors.white10,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,13 +319,21 @@ class _SleepModeScreenState extends ConsumerState<SleepModeScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        CircleAvatar(
-          radius: 24,
-          backgroundColor: theme.colorScheme.secondaryContainer,
-          child: Icon(icon, color: theme.colorScheme.onSecondaryContainer),
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white10,
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+          child: Icon(icon, color: Colors.white70, size: 24),
         ),
         const SizedBox(height: 4),
-        Text(label, style: theme.textTheme.bodySmall),
+        Text(label, style: TextStyle(color: Colors.white70, fontSize: 12)),
       ],
     );
   }
@@ -247,11 +343,55 @@ class _SleepModeScreenState extends ConsumerState<SleepModeScreen> {
       style: OutlinedButton.styleFrom(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        side: BorderSide(color: theme.colorScheme.outline),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+        backgroundColor: Colors.white.withValues(alpha: 0.05),
+        foregroundColor: Colors.white,
       ),
       onPressed: () {},
-      icon: Icon(icon, size: 16, color: theme.colorScheme.onSurface),
-      label: Text(label, style: theme.textTheme.bodySmall),
+      icon: Icon(icon, size: 18),
+      label: Text(
+        label,
+        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+      ),
     );
+  }
+
+  String _getAlarmTimeUntilText(Alarm alarm) {
+    if (!alarm.isActive) {
+      return "Alarm is inactive";
+    }
+
+    final now = DateTime.now();
+    final timeParts = alarm.time.split(':');
+    final hour = int.parse(timeParts[0]);
+    final minute = int.parse(timeParts[1]);
+
+    // Create alarm time for today
+    var alarmTime = DateTime(now.year, now.month, now.day, hour, minute);
+    
+    // If alarm time has passed today, set for tomorrow
+    if (alarmTime.isBefore(now)) {
+      alarmTime = alarmTime.add(const Duration(days: 1));
+    }
+
+    // Check if alarm should repeat on specific days
+    if (alarm.repeatDays.isNotEmpty) {
+      // Find the next valid day for this alarm
+      var checkDate = alarmTime;
+      while (!alarm.repeatDays.contains(checkDate.weekday % 7)) {
+        checkDate = checkDate.add(const Duration(days: 1));
+      }
+      alarmTime = checkDate;
+    }
+
+    final difference = alarmTime.difference(now);
+    final hours = difference.inHours;
+    final minutes = difference.inMinutes % 60;
+
+    if (hours > 0) {
+      return "Alarm active in ${hours}h ${minutes}min";
+    } else {
+      return "Alarm active in ${minutes}min";
+    }
   }
 }

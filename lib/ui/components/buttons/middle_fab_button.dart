@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import '../../../core/constants/app_strings.dart';
 
 class MiddleFABButton extends StatelessWidget {
@@ -25,7 +26,7 @@ class MiddleFABButton extends StatelessWidget {
           foregroundColor: onSecondary,
           elevation: isSelected ? 8 : 4,
           shape: const CircleBorder(),
-          child: const Icon(Icons.bed),
+          child: const Icon(Iconsax.moon5),
         ),
         const SizedBox(height: 4),
         Text(

@@ -1,7 +1,9 @@
 import 'package:ease_sleep_optimization/core/styles/button_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import '../../../core/constants/app_spacings.dart';
 import '../../../ui/components/buttons/primary_button.dart';
+import '../../../ui/components/gradient_background.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -12,19 +14,7 @@ class WelcomeScreen extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              colorScheme.primary.withValues(alpha: 0.1),
-              colorScheme.surface,
-              colorScheme.surface,
-            ],
-            stops: const [0.0, 0.7, 1.0],
-          ),
-        ),
+      body: GradientBackground(
         child: SafeArea(
           child: Padding(
             padding: AppSpacing.screenEdgePadding,
@@ -34,25 +24,20 @@ class WelcomeScreen extends StatelessWidget {
                 const Spacer(flex: 2),
 
                 // App Illustration
-                Image.asset(
-                  'lib/assets/images/illustration.png',
-                  fit: BoxFit.contain,
-                  width: 160,
-                  height: 160,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.nightlight_round,
-                      color: colorScheme.primary,
-                      size: 64,
-                    );
-                  },
+                Center(
+                  child: Image.asset(
+                    'lib/assets/images/illustration.png',
+                    fit: BoxFit.contain,
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: MediaQuery.of(context).size.width * 0.8,
+                  ),
                 ),
 
-                const SizedBox(height: AppSpacing.xLarge),
+                const SizedBox(height: AppSpacing.small),
 
                 // Main Heading
                 Text(
-                  'Find your calm with Ease',
+                  'Find your calm \nwith Ease',
                   style: theme.textTheme.displaySmall?.copyWith(
                     color: colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
@@ -103,7 +88,7 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                       ),
                       child: const Text(
-                        'Already have an account? Login',
+                        'Login',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,

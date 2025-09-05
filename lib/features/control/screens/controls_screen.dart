@@ -1,28 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax/iconsax.dart';
 import '../../../core/constants/app_spacings.dart';
 import '../providers/controls_provider.dart';
-import 'alarm_settings_screen.dart';
+import '../../../ui/components/gradient_background.dart';
 
 class ControlsScreen extends ConsumerWidget {
   const ControlsScreen({super.key});
 
-  void _navigateToAlarmSettings(
-    BuildContext context,
-    String alarmType,
-    String initialValue,
-  ) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => AlarmSettingsScreen(
-              alarmType: alarmType,
-              initialValue: initialValue,
-            ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,119 +16,92 @@ class ControlsScreen extends ConsumerWidget {
     final controls = ref.watch(controlsProvider);
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(
-            AppSpacing.screenEdgePadding.left,
-            MediaQuery.of(context).padding.top,
-            AppSpacing.screenEdgePadding.right,
-            AppSpacing.screenEdgePadding.bottom,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Text(
-                'Smart Sleep Controls',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+      body: GradientBackground(
+        primaryOpacity: 0.05,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.screenEdgePadding.left,
+              MediaQuery.of(context).padding.top,
+              AppSpacing.screenEdgePadding.right,
+              AppSpacing.screenEdgePadding.bottom,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Text(
+                  'Smart Sleep Controls',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Manage devices, alarms, and optimize your sleep environment.',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+                const SizedBox(height: 6),
+                Text(
+                  'Monitor and control your connected devices and sleep environment.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(Icons.devices, size: 18, color: colorScheme.primary),
-                  const SizedBox(width: 6),
-                  Text(
-                    '${controls['devicesConnected']} devices connected',
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.large),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Icon(
+                      Iconsax.setting_2,
+                      size: 18,
+                      color: colorScheme.primary,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${controls['devicesConnected']} devices connected',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.large),
 
-              // Smart Alarm Section
-              _SectionCard(
-                title: 'Smart Alarms',
-                children: [
-                  _AlarmField(
-                    label: 'Workday Wake',
-                    value: controls['workdayWake'],
-                    onTap:
-                        () => _navigateToAlarmSettings(
-                          context,
-                          'Workday Wake',
-                          controls['workdayWake'],
-                        ),
-                  ),
-                  _AlarmField(
-                    label: 'Weekend Chill',
-                    value: controls['weekendChill'],
-                    onTap:
-                        () => _navigateToAlarmSettings(
-                          context,
-                          'Weekend Chill',
-                          controls['weekendChill'],
-                        ),
-                  ),
-                  _AlarmField(
-                    label: 'Powerful Nap',
-                    value: controls['powerfulNap'],
-                    onTap:
-                        () => _navigateToAlarmSettings(
-                          context,
-                          'Powerful Nap',
-                          controls['powerfulNap'],
-                        ),
-                  ),
-                ],
-              ),
 
-              // Environment Section
-              _SectionCard(
-                title: 'Current Environment',
-                children: [
-                  _EnvironmentRow(
-                    label: 'Temperature',
-                    value: controls['environment']['temperature'],
-                  ),
-                  _EnvironmentRow(
-                    label: 'Humidity',
-                    value: controls['environment']['humidity'],
-                  ),
-                  _EnvironmentRow(
-                    label: 'Light',
-                    value: controls['environment']['light'],
-                  ),
-                  _EnvironmentRow(
-                    label: 'Noise',
-                    value: controls['environment']['noise'],
-                  ),
-                ],
-              ),
+                // Environment Section
+                _SectionCard(
+                  title: 'Current Environment',
+                  children: [
+                    _EnvironmentRow(
+                      label: 'Temperature',
+                      value: controls['environment']['temperature'],
+                    ),
+                    _EnvironmentRow(
+                      label: 'Humidity',
+                      value: controls['environment']['humidity'],
+                    ),
+                    _EnvironmentRow(
+                      label: 'Light',
+                      value: controls['environment']['light'],
+                    ),
+                    _EnvironmentRow(
+                      label: 'Noise',
+                      value: controls['environment']['noise'],
+                    ),
+                  ],
+                ),
 
-              // Connected Devices Section
-              _SectionCard(
-                title: 'Connected Devices',
-                children:
-                    controls['connectedDevices']
-                        .map<Widget>(
-                          (device) => _DeviceRow(
-                            name: device['name'],
-                            status: device['status'],
-                            icon: Icons.memory, // Replace with logic if needed
-                          ),
-                        )
-                        .toList(),
-              ),
-            ],
+                // Connected Devices Section
+                _SectionCard(
+                  title: 'Connected Devices',
+                  children:
+                      controls['connectedDevices']
+                          .map<Widget>(
+                            (device) => _DeviceRow(
+                              name: device['name'],
+                              status: device['status'],
+                              icon:
+                                  Iconsax
+                                      .cpu_charge, // Replace with logic if needed
+                            ),
+                          )
+                          .toList(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -163,8 +121,7 @@ class _SectionCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.large),
-      color: theme.colorScheme.surfaceContainer,
-      elevation: 3,
+      color: theme.colorScheme.primary.withValues(alpha: 0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.medium),
@@ -186,39 +143,6 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-// Alarm field row
-class _AlarmField extends StatelessWidget {
-  final String label;
-  final String value;
-  final VoidCallback onTap;
-
-  const _AlarmField({
-    required this.label,
-    required this.value,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 4),
-      title: Text(
-        label,
-        style: theme.textTheme.bodyMedium?.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      subtitle: Text(value, style: theme.textTheme.bodySmall),
-      trailing: const Icon(
-        Icons.arrow_forward_ios,
-        size: 16,
-        color: Colors.grey,
-      ),
-      onTap: onTap,
-    );
-  }
-}
 
 // Environment data row
 class _EnvironmentRow extends StatelessWidget {
@@ -269,7 +193,7 @@ class _DeviceRow extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 14,
-            backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
             child: Icon(icon, size: 16, color: theme.colorScheme.primary),
           ),
           const SizedBox(width: AppSpacing.small),

@@ -28,7 +28,8 @@ app.get("/test", (req, res) => {
 app.get("/api/sleep-sounds", async (req, res) => {
   try {
     const { category, isPremium, isActive = true } = req.query;
-    const filter = { isActive: isActive === 'true' };
+    
+    const filter = { isActive: isActive === 'true' || isActive === true };
     
     if (category) filter.category = category;
     if (isPremium !== undefined) filter.isPremium = isPremium === 'true';
@@ -43,6 +44,7 @@ app.get("/api/sleep-sounds", async (req, res) => {
       data: sounds
     });
   } catch (error) {
+    console.error('Error in sleep-sounds route:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
