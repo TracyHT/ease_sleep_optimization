@@ -66,10 +66,19 @@ class ControlsScreen extends ConsumerWidget {
                     _DeviceConnectionCard(
                       deviceName: 'BrainBit EEG Headband',
                       deviceType: 'EEG Monitor',
-                      connectionStatus: controls['brainbitStatus'] ?? 'Disconnected',
+                      connectionStatus:
+                          controls['brainbitStatus'] ?? 'Disconnected',
                       icon: Iconsax.activity,
-                      onConnect: () => ref.read(controlsProvider.notifier).connectBrainBit(),
-                      onDisconnect: () => ref.read(controlsProvider.notifier).disconnectBrainBit(),
+                      onConnect:
+                          () =>
+                              ref
+                                  .read(controlsProvider.notifier)
+                                  .connectBrainBit(),
+                      onDisconnect:
+                          () =>
+                              ref
+                                  .read(controlsProvider.notifier)
+                                  .disconnectBrainBit(),
                     ),
                   ],
                 ),
@@ -81,37 +90,73 @@ class ControlsScreen extends ConsumerWidget {
                     _DeviceConnectionCard(
                       deviceName: 'Smart Thermostat',
                       deviceType: 'Temperature Control',
-                      connectionStatus: controls['thermostatStatus'] ?? 'Disconnected',
+                      connectionStatus:
+                          controls['thermostatStatus'] ?? 'Disconnected',
                       icon: Iconsax.cpu_charge,
-                      onConnect: () => ref.read(controlsProvider.notifier).connectThermostat(),
-                      onDisconnect: () => ref.read(controlsProvider.notifier).disconnectThermostat(),
+                      onConnect:
+                          () =>
+                              ref
+                                  .read(controlsProvider.notifier)
+                                  .connectThermostat(),
+                      onDisconnect:
+                          () =>
+                              ref
+                                  .read(controlsProvider.notifier)
+                                  .disconnectThermostat(),
                     ),
                     const SizedBox(height: AppSpacing.small),
                     _DeviceConnectionCard(
                       deviceName: 'Smart Light Controller',
                       deviceType: 'Lighting Control',
-                      connectionStatus: controls['lightStatus'] ?? 'Disconnected',
+                      connectionStatus:
+                          controls['lightStatus'] ?? 'Disconnected',
                       icon: Iconsax.lamp,
-                      onConnect: () => ref.read(controlsProvider.notifier).connectSmartLight(),
-                      onDisconnect: () => ref.read(controlsProvider.notifier).disconnectSmartLight(),
+                      onConnect:
+                          () =>
+                              ref
+                                  .read(controlsProvider.notifier)
+                                  .connectSmartLight(),
+                      onDisconnect:
+                          () =>
+                              ref
+                                  .read(controlsProvider.notifier)
+                                  .disconnectSmartLight(),
                     ),
                     const SizedBox(height: AppSpacing.small),
                     _DeviceConnectionCard(
                       deviceName: 'Air Quality Monitor',
                       deviceType: 'Humidity & Air Control',
-                      connectionStatus: controls['airQualityStatus'] ?? 'Disconnected',
+                      connectionStatus:
+                          controls['airQualityStatus'] ?? 'Disconnected',
                       icon: Iconsax.wind_2,
-                      onConnect: () => ref.read(controlsProvider.notifier).connectAirQuality(),
-                      onDisconnect: () => ref.read(controlsProvider.notifier).disconnectAirQuality(),
+                      onConnect:
+                          () =>
+                              ref
+                                  .read(controlsProvider.notifier)
+                                  .connectAirQuality(),
+                      onDisconnect:
+                          () =>
+                              ref
+                                  .read(controlsProvider.notifier)
+                                  .disconnectAirQuality(),
                     ),
                     const SizedBox(height: AppSpacing.small),
                     _DeviceConnectionCard(
                       deviceName: 'Sound Controller',
                       deviceType: 'Noise Management',
-                      connectionStatus: controls['soundStatus'] ?? 'Disconnected',
+                      connectionStatus:
+                          controls['soundStatus'] ?? 'Disconnected',
                       icon: Iconsax.volume_high,
-                      onConnect: () => ref.read(controlsProvider.notifier).connectSoundController(),
-                      onDisconnect: () => ref.read(controlsProvider.notifier).disconnectSoundController(),
+                      onConnect:
+                          () =>
+                              ref
+                                  .read(controlsProvider.notifier)
+                                  .connectSoundController(),
+                      onDisconnect:
+                          () =>
+                              ref
+                                  .read(controlsProvider.notifier)
+                                  .disconnectSoundController(),
                     ),
                   ],
                 ),
@@ -143,11 +188,36 @@ class ControlsScreen extends ConsumerWidget {
                 _SectionCard(
                   title: 'Connected Devices Summary',
                   children: [
-                    _buildDeviceStatusRow(context, 'EEG Monitoring', controls['brainbitStatus'] ?? 'Disconnected', Iconsax.activity),
-                    _buildDeviceStatusRow(context, 'Temperature Control', controls['thermostatStatus'] ?? 'Disconnected', Iconsax.cpu_charge),
-                    _buildDeviceStatusRow(context, 'Lighting Control', controls['lightStatus'] ?? 'Disconnected', Iconsax.lamp),
-                    _buildDeviceStatusRow(context, 'Air Quality', controls['airQualityStatus'] ?? 'Disconnected', Iconsax.wind_2),
-                    _buildDeviceStatusRow(context, 'Sound Control', controls['soundStatus'] ?? 'Disconnected', Iconsax.volume_high),
+                    _buildDeviceStatusRow(
+                      context,
+                      'EEG Monitoring',
+                      controls['brainbitStatus'] ?? 'Disconnected',
+                      Iconsax.activity,
+                    ),
+                    _buildDeviceStatusRow(
+                      context,
+                      'Temperature Control',
+                      controls['thermostatStatus'] ?? 'Disconnected',
+                      Iconsax.cpu_charge,
+                    ),
+                    _buildDeviceStatusRow(
+                      context,
+                      'Lighting Control',
+                      controls['lightStatus'] ?? 'Disconnected',
+                      Iconsax.lamp,
+                    ),
+                    _buildDeviceStatusRow(
+                      context,
+                      'Air Quality',
+                      controls['airQualityStatus'] ?? 'Disconnected',
+                      Iconsax.wind_2,
+                    ),
+                    _buildDeviceStatusRow(
+                      context,
+                      'Sound Control',
+                      controls['soundStatus'] ?? 'Disconnected',
+                      Iconsax.volume_high,
+                    ),
                   ],
                 ),
               ],
@@ -168,7 +238,7 @@ class ControlsScreen extends ConsumerWidget {
       controls['airQualityStatus'],
       controls['soundStatus'],
     ];
-    
+
     for (final status in deviceStatuses) {
       if (status?.toString().toLowerCase() == 'connected') {
         count++;
@@ -178,34 +248,37 @@ class ControlsScreen extends ConsumerWidget {
   }
 
   // Helper method to build device status rows
-  Widget _buildDeviceStatusRow(BuildContext context, String deviceType, String status, IconData icon) {
+  Widget _buildDeviceStatusRow(
+    BuildContext context,
+    String deviceType,
+    String status,
+    IconData icon,
+  ) {
     final theme = Theme.of(context);
     final isConnected = status.toLowerCase() == 'connected';
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xSmall),
       child: Row(
         children: [
           CircleAvatar(
             radius: 14,
-            backgroundColor: (isConnected ? Colors.green : Colors.grey).withValues(alpha: 0.1),
+            backgroundColor: (isConnected ? Colors.green : Colors.grey)
+                .withValues(alpha: 0.1),
             child: Icon(
-              icon, 
-              size: 16, 
+              icon,
+              size: 16,
               color: isConnected ? Colors.green : Colors.grey,
             ),
           ),
           const SizedBox(width: AppSpacing.small),
-          Expanded(
-            child: Text(
-              deviceType,
-              style: theme.textTheme.bodyMedium,
-            ),
-          ),
+          Expanded(child: Text(deviceType, style: theme.textTheme.bodyMedium)),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: (isConnected ? Colors.green : Colors.grey).withValues(alpha: 0.1),
+              color: (isConnected ? Colors.green : Colors.grey).withValues(
+                alpha: 0.1,
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -244,14 +317,17 @@ class _DeviceConnectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isConnected = connectionStatus.toLowerCase() == 'connected';
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
+        color: theme.colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isConnected ? Colors.green.withValues(alpha: 0.3) : Colors.grey.withValues(alpha: 0.3),
+          color:
+              isConnected
+                  ? Colors.green.withValues(alpha: 0.3)
+                  : Colors.grey.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -264,7 +340,10 @@ class _DeviceConnectionCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: (isConnected ? Colors.green : theme.colorScheme.primary).withValues(alpha: 0.1),
+                backgroundColor: (isConnected
+                        ? Colors.green
+                        : theme.colorScheme.primary)
+                    .withValues(alpha: 0.1),
                 child: Icon(
                   icon,
                   size: 20,
@@ -287,7 +366,9 @@ class _DeviceConnectionCard extends StatelessWidget {
                     Text(
                       deviceType,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.7,
+                        ),
                       ),
                     ),
                   ],
@@ -296,7 +377,8 @@ class _DeviceConnectionCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: (isConnected ? Colors.green : Colors.orange).withValues(alpha: 0.1),
+                  color: (isConnected ? Colors.green : Colors.orange)
+                      .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -310,19 +392,24 @@ class _DeviceConnectionCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          
+
           // Action Buttons
-          if (!isConnected) 
+          if (!isConnected)
             // Connect Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: onConnect,
                 icon: const Icon(Iconsax.link, size: 16),
-                label: const Text('Connect Device'),
+                label: const Text(
+                  'Connect Device',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                  foregroundColor: theme.colorScheme.primary,
+                  backgroundColor: theme.colorScheme.primary.withValues(
+                    alpha: 0.5,
+                  ),
+                  foregroundColor: theme.colorScheme.onPrimaryContainer,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
@@ -334,11 +421,19 @@ class _DeviceConnectionCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () => _showDisconnectDialog(context, deviceName, onDisconnect),
+                    onPressed:
+                        () => _showDisconnectDialog(
+                          context,
+                          deviceName,
+                          onDisconnect,
+                        ),
                     icon: const Icon(Iconsax.close_circle, size: 16),
-                    label: const Text('Disconnect'),
+                    label: const Text(
+                      'Disconnect',
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.withValues(alpha: 0.1),
+                      backgroundColor: Colors.red.withValues(alpha: 0.2),
                       foregroundColor: Colors.red,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -350,9 +445,14 @@ class _DeviceConnectionCard extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () => _showDeviceSettings(context, deviceName),
                     icon: const Icon(Iconsax.setting_2, size: 16),
-                    label: const Text('Settings'),
+                    label: const Text(
+                      'Settings',
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.colorScheme.secondary.withValues(alpha: 0.1),
+                      backgroundColor: theme.colorScheme.secondary.withValues(
+                        alpha: 0.2,
+                      ),
                       foregroundColor: theme.colorScheme.secondary,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -367,45 +467,52 @@ class _DeviceConnectionCard extends StatelessWidget {
   }
 
   // Show disconnect confirmation dialog
-  void _showDisconnectDialog(BuildContext context, String deviceName, VoidCallback onDisconnect) {
+  void _showDisconnectDialog(
+    BuildContext context,
+    String deviceName,
+    VoidCallback onDisconnect,
+  ) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2E2E2E),
-        title: Row(
-          children: [
-            const Icon(Iconsax.warning_2, color: Colors.orange),
-            const SizedBox(width: 12),
-            Text(
-              'Disconnect Device',
-              style: const TextStyle(color: Colors.white),
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: const Color(0xFF2E2E2E),
+            title: Row(
+              children: [
+                const Icon(Iconsax.warning_2, color: Colors.orange),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Disconnect Device',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        content: Text(
-          'Are you sure you want to disconnect $deviceName? This will stop monitoring and control features for this device.',
-          style: const TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Colors.white70),
+            content: Text(
+              'Are you sure you want to disconnect $deviceName? This will stop monitoring and control features for this device.',
+              style: const TextStyle(color: Colors.white70),
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.white70),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onDisconnect();
+                },
+                child: const Text(
+                  'Disconnect',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              onDisconnect();
-            },
-            child: const Text(
-              'Disconnect',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -413,57 +520,75 @@ class _DeviceConnectionCard extends StatelessWidget {
   void _showDeviceSettings(BuildContext context, String deviceName) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2E2E2E),
-        title: Row(
-          children: [
-            const Icon(Iconsax.setting_2, color: Colors.white),
-            const SizedBox(width: 12),
-            Text(
-              '$deviceName Settings',
-              style: const TextStyle(color: Colors.white),
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: const Color(0xFF2E2E2E),
+            title: Row(
+              children: [
+                const Icon(Iconsax.setting_2, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    '$deviceName Settings',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Iconsax.cpu_charge, color: Colors.white70),
-              title: const Text('Device Information', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.of(context).pop();
-                // TODO: Show device info
-              },
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(
+                    Iconsax.cpu_charge,
+                    color: Colors.white70,
+                  ),
+                  title: const Text(
+                    'Device Information',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    // TODO: Show device info
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Iconsax.notification,
+                    color: Colors.white70,
+                  ),
+                  title: const Text(
+                    'Notifications',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    // TODO: Configure notifications
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Iconsax.refresh, color: Colors.white70),
+                  title: const Text(
+                    'Calibrate Device',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    // TODO: Start calibration
+                  },
+                ),
+              ],
             ),
-            ListTile(
-              leading: const Icon(Iconsax.notification, color: Colors.white70),
-              title: const Text('Notifications', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.of(context).pop();
-                // TODO: Configure notifications
-              },
-            ),
-            ListTile(
-              leading: const Icon(Iconsax.refresh, color: Colors.white70),
-              title: const Text('Calibrate Device', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.of(context).pop();
-                // TODO: Start calibration
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Close',
-              style: TextStyle(color: Colors.white70),
-            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Close',
+                  style: TextStyle(color: Colors.white70),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }
