@@ -11,6 +11,7 @@ class HiveService {
   static const String eegFeaturesBox = 'eeg_features';
   static const String envLogBox = 'env_log';
   static const String userPreferencesBox = 'user_preferences';
+  static const String alarmsBox = 'alarms';
 
   static Future<void> initialize() async {
     // Open boxes - using generic boxes for now (can be upgraded to typed boxes later)
@@ -23,6 +24,7 @@ class HiveService {
     await Hive.openBox(eegFeaturesBox);
     await Hive.openBox(envLogBox);
     await Hive.openBox(userPreferencesBox);
+    await Hive.openBox(alarmsBox);
     
     print('Hive initialized successfully');
   }
@@ -42,12 +44,13 @@ class HiveService {
   static Box get eegFeatures => Hive.box(eegFeaturesBox);
   static Box get envLog => Hive.box(envLogBox);
   static Box get userPreferences => Hive.box(userPreferencesBox);
+  static Box get alarms => Hive.box(alarmsBox);
 
   // Helper methods for common operations
   static Future<void> clearAllData() async {
     final boxesToClear = [
       sleepSessionsBox, devicesBox, eegRawDataBox, sleepQualityMetricsBox,
-      envDataBox, sleepStagesScoringBox, eegFeaturesBox, envLogBox, userPreferencesBox
+      envDataBox, sleepStagesScoringBox, eegFeaturesBox, envLogBox, userPreferencesBox, alarmsBox
     ];
     
     for (String boxName in boxesToClear) {
@@ -124,5 +127,41 @@ class HiveService {
         .where((env) => (env as Map)['sessionId'] == sessionId)
         .map((env) => Map<String, dynamic>.from(env as Map))
         .toList();
+  }
+
+  // Debug method to view all records in any box
+  static void debugPrintBoxContents(String boxName) {
+    if (Hive.isBoxOpen(boxName)) {
+      final box = Hive.box(boxName);
+      print('=== $boxName Box Contents ===');
+      print('Total records: ${box.length}');
+      
+      if (box.isEmpty) {
+        print('Box is empty');
+      } else {
+        box.keys.forEach((key) {
+          final value = box.get(key);
+          print('Key: $key');
+          print('Value: $value');
+          print('---');
+        });
+      }
+      print('=== End of $boxName ===\n');
+    } else {
+      print('Box $boxName is not open');
+    }
+  }
+
+  // Debug all boxes
+  static void debugPrintAllBoxes() {
+    const allBoxes = [
+      sleepSessionsBox, devicesBox, eegRawDataBox, sleepQualityMetricsBox,
+      envDataBox, sleepStagesScoringBox, eegFeaturesBox, envLogBox, 
+      userPreferencesBox, alarmsBox
+    ];
+    
+    for (String boxName in allBoxes) {
+      debugPrintBoxContents(boxName);
+    }
   }
 }

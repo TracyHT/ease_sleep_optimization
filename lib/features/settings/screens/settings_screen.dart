@@ -6,6 +6,7 @@ import '../../../core/constants/app_spacings.dart';
 import '../../../ui/components/gradient_background.dart';
 import '../../../services/api_services.dart';
 import '../../../core/providers/user_provider.dart';
+import 'database_cms_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -284,6 +285,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     trailing: Icon(Iconsax.code5, color: colorScheme.primary),
                     onTap: () {
                       Navigator.pushNamed(context, '/database-test');
+                    },
+                  ),
+
+                  // Database CMS Button (Development only)
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      'Database CMS',
+                      style: TextStyle(color: colorScheme.secondary),
+                    ),
+                    trailing: Icon(Iconsax.archive_book, color: colorScheme.secondary),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const DatabaseCMSScreen(),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 40),

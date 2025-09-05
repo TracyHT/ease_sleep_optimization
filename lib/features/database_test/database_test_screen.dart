@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../core/constants/app_spacings.dart';
 import '../../services/database_test_service.dart';
 import '../../services/local_database_service.dart';
 
@@ -188,162 +187,204 @@ class _DatabaseTestScreenState extends State<DatabaseTestScreen> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () {
+              setState(() {
+                _output = 'Output cleared...';
+              });
+            },
+            tooltip: 'Clear Output',
+          ),
+        ],
       ),
-      body: Padding(
-        padding: AppSpacing.screenEdgePadding,
-        child: Column(
-          children: [
-            // Database Stats Card
-            if (_dbStats != null) ...[
-              Card(
-                color: colorScheme.primaryContainer.withValues(alpha: 0.1),
-                child: Padding(
-                  padding: AppSpacing.mediumPadding,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Database Statistics',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.onSurface,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              // Database Stats Card - Make it more compact
+              if (_dbStats != null) ...[
+                Card(
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.1),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Database Statistics',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurface,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: AppSpacing.small),
-                      ...(_dbStats!.entries.where((e) => e.key != 'totalRecords' && e.key != 'error').map((e) =>
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 2),
-                          child: Row(
+                        const SizedBox(height: 8),
+                        // Make stats more compact with grid layout
+                        Wrap(
+                          spacing: 16,
+                          runSpacing: 4,
+                          children: _dbStats!.entries
+                              .where((e) => e.key != 'totalRecords' && e.key != 'error')
+                              .map((e) => SizedBox(
+                                    width: 100,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            e.key,
+                                            style: theme.textTheme.bodySmall,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        Text(
+                                          '${e.value}',
+                                          style: theme.textTheme.bodySmall?.copyWith(
+                                            fontWeight: FontWeight.w500,
+                                            color: colorScheme.primary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ))
+                              .toList(),
+                        ),
+                        if (_dbStats!['totalRecords'] != null) ...[
+                          const Divider(height: 16),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(e.key, style: theme.textTheme.bodyMedium),
-                              Text('${e.value}', style: theme.textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: colorScheme.primary,
-                              )),
+                              Text(
+                                'Total Records',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                '${_dbStats!['totalRecords']}',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: colorScheme.primary,
+                                ),
+                              ),
                             ],
                           ),
-                        ),
-                      ).toList()),
-                      const Divider(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Total Records',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Text(
-                            '${_dbStats!['totalRecords'] ?? 0}',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: colorScheme.primary,
-                            ),
-                          ),
                         ],
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+
+              // Test Buttons - Make them smaller and more compact
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      _CompactButton(
+                        onPressed: _isRunning ? null : _runAllTests,
+                        icon: Icons.play_arrow,
+                        label: 'Run Tests',
+                        color: colorScheme.primary,
+                      ),
+                      _CompactButton(
+                        onPressed: _isRunning ? null : _generateSampleData,
+                        icon: Icons.data_object,
+                        label: 'Generate Data',
+                        color: colorScheme.secondary,
+                      ),
+                      _CompactButton(
+                        onPressed: _isRunning ? null : _showUserSessions,
+                        icon: Icons.list,
+                        label: 'Show Sessions',
+                        color: colorScheme.tertiary,
+                      ),
+                      _CompactButton(
+                        onPressed: _isRunning ? null : _clearAllData,
+                        icon: Icons.clear_all,
+                        label: 'Clear Data',
+                        color: colorScheme.error,
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: AppSpacing.medium),
-            ],
 
-            // Test Buttons
-            Wrap(
-              spacing: AppSpacing.small,
-              runSpacing: AppSpacing.small,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _isRunning ? null : _runAllTests,
-                  icon: const Icon(Icons.play_arrow),
-                  label: const Text('Run All Tests'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: _isRunning ? null : _generateSampleData,
-                  icon: const Icon(Icons.data_object),
-                  label: const Text('Generate Sample Data'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.secondary,
-                    foregroundColor: colorScheme.onSecondary,
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: _isRunning ? null : _showUserSessions,
-                  icon: const Icon(Icons.list),
-                  label: const Text('Show Sessions'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.tertiary,
-                    foregroundColor: colorScheme.onTertiary,
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: _isRunning ? null : _clearAllData,
-                  icon: const Icon(Icons.clear_all),
-                  label: const Text('Clear Data'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.error,
-                    foregroundColor: colorScheme.onError,
-                  ),
-                ),
-              ],
-            ),
+              const SizedBox(height: 8),
 
-            const SizedBox(height: AppSpacing.medium),
-
-            // Output Section
-            Expanded(
-              child: Card(
-                color: colorScheme.surfaceContainer,
-                child: Padding(
-                  padding: AppSpacing.mediumPadding,
+              // Output Section - Much larger and better formatted
+              Expanded(
+                child: Card(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Icon(Icons.terminal, color: colorScheme.primary),
-                          const SizedBox(width: AppSpacing.small),
-                          Text(
-                            'Output',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const Spacer(),
-                          if (_isRunning)
-                            SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                      // Header with better controls
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainerHighest,
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.terminal, color: colorScheme.primary, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Output Console',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                        ],
+                            const Spacer(),
+                            if (_isRunning)
+                              SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                                ),
+                              ),
+                            const SizedBox(width: 8),
+                            IconButton(
+                              icon: const Icon(Icons.copy, size: 18),
+                              onPressed: () {
+                                // Copy output to clipboard functionality
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Output copied to clipboard'),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                              tooltip: 'Copy Output',
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: AppSpacing.small),
+                      // Output content with better formatting
                       Expanded(
                         child: Container(
                           width: double.infinity,
-                          padding: AppSpacing.smallPadding,
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: colorScheme.surface,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
+                            color: const Color(0xFF0D1117), // Dark terminal-like background
+                            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
                           ),
                           child: SingleChildScrollView(
-                            child: Text(
+                            child: SelectableText(
                               _output,
-                              style: theme.textTheme.bodySmall?.copyWith(
+                              style: TextStyle(
                                 fontFamily: 'monospace',
-                                color: colorScheme.onSurface,
+                                fontSize: 13,
+                                color: const Color(0xFFE6EDF3), // Light terminal text
+                                height: 1.4, // Better line spacing
                               ),
                             ),
                           ),
@@ -353,8 +394,44 @@ class _DatabaseTestScreenState extends State<DatabaseTestScreen> {
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Compact button widget for better layout
+class _CompactButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _CompactButton({
+    required this.onPressed,
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 36,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 16),
+        label: Text(
+          label,
+          style: const TextStyle(fontSize: 12),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          visualDensity: VisualDensity.compact,
         ),
       ),
     );
