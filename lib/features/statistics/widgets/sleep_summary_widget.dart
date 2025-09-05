@@ -29,7 +29,7 @@ class SleepSummaryWidget extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: colorScheme.primaryContainer.withOpacity(0.15),
+            color: colorScheme.primaryContainer.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -145,6 +145,19 @@ class _SleepScoreCircle extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    // Determine color based on score
+    Color getScoreColor() {
+      if (score >= 80) {
+        return colorScheme.primary; // Excellent - use primary color
+      } else if (score >= 60) {
+        return Colors.orange; // Good
+      } else {
+        return Colors.red; // Poor
+      }
+    }
+
+    final scoreColor = getScoreColor();
+
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -154,14 +167,15 @@ class _SleepScoreCircle extends StatelessWidget {
           child: CircularProgressIndicator(
             value: score / 100,
             strokeWidth: size * 0.1,
-            backgroundColor: colorScheme.primaryContainer.withOpacity(0.4),
-            valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+            backgroundColor: colorScheme.primaryContainer.withValues(alpha: 0.4),
+            valueColor: AlwaysStoppedAnimation<Color>(scoreColor),
           ),
         ),
         Text(
           '$score',
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
       ],
