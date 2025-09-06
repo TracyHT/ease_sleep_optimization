@@ -81,12 +81,14 @@ class _SleepModeScreenState extends ConsumerState<SleepModeScreen> {
                   builder: (context, ref, child) {
                     final alarms = ref.watch(alarmsProvider);
                     final activeAlarms = alarms.where((alarm) => alarm.isActive).toList();
-                    final selectedAlarm = selectedAlarmId != null 
-                        ? alarms.firstWhere(
-                            (alarm) => alarm.id == selectedAlarmId,
-                            orElse: () => activeAlarms.isNotEmpty ? activeAlarms.first : alarms.first,
-                          )
-                        : (activeAlarms.isNotEmpty ? activeAlarms.first : alarms.first);
+                    final selectedAlarm = alarms.isNotEmpty
+                        ? (selectedAlarmId != null 
+                            ? alarms.firstWhere(
+                                (alarm) => alarm.id == selectedAlarmId,
+                                orElse: () => activeAlarms.isNotEmpty ? activeAlarms.first : alarms.first,
+                              )
+                            : (activeAlarms.isNotEmpty ? activeAlarms.first : alarms.first))
+                        : null;
                     
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,7 +108,7 @@ class _SleepModeScreenState extends ConsumerState<SleepModeScreen> {
                               ),
                             ),
                             child: DropdownButton<String>(
-                              value: selectedAlarmId ?? selectedAlarm.id,
+                              value: selectedAlarmId ?? selectedAlarm?.id,
                               isExpanded: true,
                               underline: const SizedBox(),
                               dropdownColor: const Color(0xFF1E1E1E),
@@ -130,52 +132,55 @@ class _SleepModeScreenState extends ConsumerState<SleepModeScreen> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          Text(
-                            _getAlarmTimeUntilText(selectedAlarm),
-                            style: const TextStyle(color: Colors.grey),
-                          ),
+                          if (selectedAlarm != null)
+                            Text(
+                              _getAlarmTimeUntilText(selectedAlarm),
+                              style: const TextStyle(color: Colors.grey),
+                            ),
                           const SizedBox(height: 12),
-                          SwitchListTile(
-                            title: const Text(
-                              "Alarm Status",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
+                          if (selectedAlarm != null) ...[
+                            SwitchListTile(
+                              title: const Text(
+                                "Alarm Status",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
+                              value: selectedAlarm.isActive,
+                              activeColor: colorScheme.primary,
+                              onChanged: (value) {
+                                ref.read(alarmsProvider.notifier).toggleAlarmStatus(selectedAlarm.id);
+                              },
                             ),
-                            value: selectedAlarm.isActive,
-                            activeColor: colorScheme.primary,
-                            onChanged: (value) {
-                              ref.read(alarmsProvider.notifier).toggleAlarmStatus(selectedAlarm.id);
-                            },
-                          ),
-                          SwitchListTile(
-                            title: const Text(
-                              "Snooze",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
+                            SwitchListTile(
+                              title: const Text(
+                                "Snooze",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
+                              value: selectedAlarm.snoozeEnabled,
+                              activeColor: colorScheme.primary,
+                              onChanged: (value) {
+                                final updatedAlarm = Alarm(
+                                  id: selectedAlarm.id,
+                                  time: selectedAlarm.time,
+                                  label: selectedAlarm.label,
+                                  sound: selectedAlarm.sound,
+                                  snoozeEnabled: value,
+                                  snoozeDuration: selectedAlarm.snoozeDuration,
+                                  alarmType: selectedAlarm.alarmType,
+                                  repeatDays: selectedAlarm.repeatDays,
+                                  createdAt: selectedAlarm.createdAt,
+                                  updatedAt: DateTime.now(),
+                                  isActive: selectedAlarm.isActive,
+                                );
+                                ref.read(alarmsProvider.notifier).updateAlarm(updatedAlarm);
+                              },
                             ),
-                            value: selectedAlarm.snoozeEnabled,
-                            activeColor: colorScheme.primary,
-                            onChanged: (value) {
-                              final updatedAlarm = Alarm(
-                                id: selectedAlarm.id,
-                                time: selectedAlarm.time,
-                                label: selectedAlarm.label,
-                                sound: selectedAlarm.sound,
-                                snoozeEnabled: value,
-                                snoozeDuration: selectedAlarm.snoozeDuration,
-                                alarmType: selectedAlarm.alarmType,
-                                repeatDays: selectedAlarm.repeatDays,
-                                createdAt: selectedAlarm.createdAt,
-                                updatedAt: DateTime.now(),
-                                isActive: selectedAlarm.isActive,
-                              );
-                              ref.read(alarmsProvider.notifier).updateAlarm(updatedAlarm);
-                            },
-                          ),
+                          ],
                         ] else ...[
                           Center(
                             child: Column(

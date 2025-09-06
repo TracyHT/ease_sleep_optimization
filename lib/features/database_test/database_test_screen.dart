@@ -13,7 +13,6 @@ class DatabaseTestScreen extends StatefulWidget {
 class _DatabaseTestScreenState extends State<DatabaseTestScreen> {
   String _output = 'Tap a button to test the database...';
   bool _isRunning = false;
-  Map<String, dynamic>? _testResults;
   Map<String, dynamic>? _dbStats;
 
   @override
@@ -28,6 +27,7 @@ class _DatabaseTestScreenState extends State<DatabaseTestScreen> {
     });
   }
 
+  // ignore: unused_element
   void _appendOutput(String text) {
     setState(() {
       _output += '\n$text';
@@ -38,21 +38,20 @@ class _DatabaseTestScreenState extends State<DatabaseTestScreen> {
     setState(() {
       _isRunning = true;
       _output = 'Running all database tests...\n';
-      _testResults = null;
     });
 
     try {
       final results = await DatabaseTestService.runAllTests();
       setState(() {
-        _testResults = results;
         _output += '\n--- TEST RESULTS ---\n';
-        
+
         final summary = results['summary'];
         if (summary != null) {
           _output += 'Total Tests: ${summary['totalTests']}\n';
           _output += 'Passed: ${summary['passed']}\n';
           _output += 'Failed: ${summary['failed']}\n';
-          _output += 'Overall: ${summary['success'] ? '✅ SUCCESS' : '❌ FAILED'}\n';
+          _output +=
+              'Overall: ${summary['success'] ? '✅ SUCCESS' : '❌ FAILED'}\n';
         }
 
         // Show individual test results
@@ -70,7 +69,7 @@ class _DatabaseTestScreenState extends State<DatabaseTestScreen> {
           _output += '\nCritical Error: ${results['error']}';
         }
       });
-      
+
       _updateStats();
     } catch (e) {
       setState(() {
@@ -93,15 +92,16 @@ class _DatabaseTestScreenState extends State<DatabaseTestScreen> {
       // Get current user ID to generate data for the logged-in user
       final currentUser = FirebaseAuth.instance.currentUser;
       final firebaseUid = currentUser?.uid;
-      
+
       await DatabaseTestService.generateSampleData(
         days: 7,
         firebaseUid: firebaseUid,
       );
-      
+
       setState(() {
         _output += 'Sample data generated successfully!\n';
-        _output += 'Generated 7 days of sleep tracking data for user: ${firebaseUid ?? 'test_user'}\n';
+        _output +=
+            'Generated 7 days of sleep tracking data for user: ${firebaseUid ?? 'test_user'}\n';
         _output += 'You can now view real statistics in the Statistics screen.';
       });
       _updateStats();
@@ -145,10 +145,12 @@ class _DatabaseTestScreenState extends State<DatabaseTestScreen> {
     });
 
     try {
-      final sessions = LocalDatabaseService.getUserSleepSessions(DatabaseTestService.testUserId);
+      final sessions = LocalDatabaseService.getUserSleepSessions(
+        DatabaseTestService.testUserId,
+      );
       setState(() {
         _output += 'Found ${sessions.length} sleep sessions:\n';
-        
+
         for (int i = 0; i < sessions.length && i < 10; i++) {
           final session = sessions[i];
           _output += '\nSession ${session['sessionId']}:';
@@ -156,7 +158,7 @@ class _DatabaseTestScreenState extends State<DatabaseTestScreen> {
           _output += '\n  End: ${session['endTime']}';
           _output += '\n  User: ${session['firebaseUid']}';
         }
-        
+
         if (sessions.length > 10) {
           _output += '\n... and ${sessions.length - 10} more sessions';
         }
@@ -225,31 +227,39 @@ class _DatabaseTestScreenState extends State<DatabaseTestScreen> {
                         Wrap(
                           spacing: 16,
                           runSpacing: 4,
-                          children: _dbStats!.entries
-                              .where((e) => e.key != 'totalRecords' && e.key != 'error')
-                              .map((e) => SizedBox(
-                                    width: 100,
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            e.key,
-                                            style: theme.textTheme.bodySmall,
-                                            overflow: TextOverflow.ellipsis,
+                          children:
+                              _dbStats!.entries
+                                  .where(
+                                    (e) =>
+                                        e.key != 'totalRecords' &&
+                                        e.key != 'error',
+                                  )
+                                  .map(
+                                    (e) => SizedBox(
+                                      width: 100,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              e.key,
+                                              style: theme.textTheme.bodySmall,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          '${e.value}',
-                                          style: theme.textTheme.bodySmall?.copyWith(
-                                            fontWeight: FontWeight.w500,
-                                            color: colorScheme.primary,
+                                          Text(
+                                            '${e.value}',
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.w500,
+                                                  color: colorScheme.primary,
+                                                ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ))
-                              .toList(),
+                                  )
+                                  .toList(),
                         ),
                         if (_dbStats!['totalRecords'] != null) ...[
                           const Divider(height: 16),
@@ -325,14 +335,23 @@ class _DatabaseTestScreenState extends State<DatabaseTestScreen> {
                     children: [
                       // Header with better controls
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         decoration: BoxDecoration(
                           color: colorScheme.surfaceContainerHighest,
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(12),
+                          ),
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.terminal, color: colorScheme.primary, size: 20),
+                            Icon(
+                              Icons.terminal,
+                              color: colorScheme.primary,
+                              size: 20,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               'Output Console',
@@ -347,7 +366,9 @@ class _DatabaseTestScreenState extends State<DatabaseTestScreen> {
                                 height: 16,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    colorScheme.primary,
+                                  ),
                                 ),
                               ),
                             const SizedBox(width: 8),
@@ -374,8 +395,12 @@ class _DatabaseTestScreenState extends State<DatabaseTestScreen> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF0D1117), // Dark terminal-like background
-                            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+                            color: const Color(
+                              0xFF0D1117,
+                            ), // Dark terminal-like background
+                            borderRadius: const BorderRadius.vertical(
+                              bottom: Radius.circular(12),
+                            ),
                           ),
                           child: SingleChildScrollView(
                             child: SelectableText(
@@ -383,7 +408,9 @@ class _DatabaseTestScreenState extends State<DatabaseTestScreen> {
                               style: TextStyle(
                                 fontFamily: 'monospace',
                                 fontSize: 13,
-                                color: const Color(0xFFE6EDF3), // Light terminal text
+                                color: const Color(
+                                  0xFFE6EDF3,
+                                ), // Light terminal text
                                 height: 1.4, // Better line spacing
                               ),
                             ),
@@ -423,10 +450,7 @@ class _CompactButton extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: onPressed,
         icon: Icon(icon, size: 16),
-        label: Text(
-          label,
-          style: const TextStyle(fontSize: 12),
-        ),
+        label: Text(label, style: const TextStyle(fontSize: 12)),
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           foregroundColor: Colors.white,

@@ -7,14 +7,6 @@ class SleepStageChartWidget extends StatelessWidget {
 
   const SleepStageChartWidget({super.key, required this.data});
 
-  // Helper to add small random offset ±0.1 to stage values
-  static double _variedStage(int stage) {
-    final rand = Random();
-    double offset = (rand.nextDouble() - 0.5) * 0.2; // from -0.1 to +0.1
-    double varied = stage + offset;
-    // Clamp to valid range 0 to 3
-    return varied.clamp(0, 3);
-  }
 
   // Create from sleep stage scoring data
   factory SleepStageChartWidget.fromDatabase({
@@ -39,13 +31,13 @@ class SleepStageChartWidget extends StatelessWidget {
       int stageValue;
       switch (sleepStage) {
         case 'Wake':
-          stageValue = 3;
+          stageValue = 4;
           break;
         case 'REM':
-          stageValue = 2;
+          stageValue = 3;
           break;
         case 'N1':
-          stageValue = 1;
+          stageValue = 2;
           break;
         case 'N2':
           stageValue = 1;
@@ -57,41 +49,97 @@ class SleepStageChartWidget extends StatelessWidget {
           stageValue = 1;
       }
       
-      // Each epoch represents 30 seconds, convert to time
-      final epochTime = startTime.add(Duration(seconds: epochIndex * 30));
+      // Each epoch represents 24 minutes (8 hours / 20 epochs), convert to time
+      final epochTime = startTime.add(Duration(minutes: epochIndex * 24));
       chartData.add(SleepStageData(epochTime, stageValue));
     }
     
     return SleepStageChartWidget(data: chartData);
   }
 
-  // Mock data with 30-minute intervals and varied stage values for more natural curve
-  factory SleepStageChartWidget.mock() {
-    final now = DateTime.now();
+  // Mock data with date-specific variation and realistic sleep architecture
+  factory SleepStageChartWidget.mock({DateTime? selectedDate}) {
+    final baseDate = selectedDate ?? DateTime.now();
+    
+    // Use date as seed for consistent but different patterns per day
+    final seed = baseDate.year * 10000 + baseDate.month * 100 + baseDate.day;
+    final random = Random(seed);
+    
+    // Create realistic sleep architecture based on the date
+    final sleepStart = DateTime(baseDate.year, baseDate.month, baseDate.day, 22, 30);
+    
     return SleepStageChartWidget(
-      data:
-          [
-                SleepStageData(now, 3),
-                SleepStageData(now.add(Duration(minutes: 30)), 2),
-                SleepStageData(now.add(Duration(hours: 1)), 1),
-                SleepStageData(now.add(Duration(hours: 1, minutes: 30)), 0),
-                SleepStageData(now.add(Duration(hours: 2)), 1),
-                SleepStageData(now.add(Duration(hours: 2, minutes: 30)), 1),
-                SleepStageData(now.add(Duration(hours: 3)), 2),
-                SleepStageData(now.add(Duration(hours: 3, minutes: 30)), 1),
-                SleepStageData(now.add(Duration(hours: 4)), 0),
-                SleepStageData(now.add(Duration(hours: 4, minutes: 30)), 1),
-                SleepStageData(now.add(Duration(hours: 5)), 2),
-                SleepStageData(now.add(Duration(hours: 5, minutes: 30)), 2),
-                SleepStageData(now.add(Duration(hours: 6)), 1),
-                SleepStageData(now.add(Duration(hours: 6, minutes: 30)), 0),
-                SleepStageData(now.add(Duration(hours: 7)), 1),
-                SleepStageData(now.add(Duration(hours: 7, minutes: 30)), 2),
-                SleepStageData(now.add(Duration(hours: 8)), 3),
-              ]
-              .map((e) => SleepStageData(e.time, _variedStage(e.stage).toInt()))
-              .toList(),
+      data: _generateRealisticSleepPattern(sleepStart, random),
     );
+  }
+  
+  // Generate realistic sleep pattern based on sleep science
+  static List<SleepStageData> _generateRealisticSleepPattern(DateTime startTime, Random random) {
+    final List<SleepStageData> data = [];
+    final int totalMinutes = 480; // 8 hours
+    const int intervalMinutes = 15; // 15-minute intervals for smoother chart
+    
+    // Sleep stages follow typical pattern:
+    // 1. Initial wake period (5-15 min)
+    // 2. N1/N2 light sleep (first 90 min cycle)
+    // 3. Deep sleep N3 (30-60 min in first half)
+    // 4. REM cycles (longer in second half)
+    // 5. Brief awakenings
+    
+    int currentMinute = 0;
+    
+    while (currentMinute < totalMinutes) {
+      final cyclePosition = (currentMinute % 90) / 90.0; // 90-min sleep cycles
+      final sleepProgress = currentMinute / totalMinutes.toDouble();
+      
+      int stage;
+      
+      if (currentMinute < 15) {
+        // Initial settling period
+        stage = random.nextDouble() < 0.7 ? 4 : 2; // Mostly awake, some N1
+      } else if (sleepProgress < 0.3) {
+        // First third: Deep sleep more likely
+        if (cyclePosition < 0.2) {
+          stage = random.nextDouble() < 0.5 ? 2 : 1; // N1 or N2
+        } else if (cyclePosition < 0.6) {
+          stage = random.nextDouble() < 0.6 ? 0 : 1; // More N3 or N2
+        } else {
+          stage = random.nextDouble() < 0.3 ? 3 : 1; // Some REM or N2
+        }
+      } else if (sleepProgress < 0.8) {
+        // Middle third: Mix of stages
+        if (cyclePosition < 0.3) {
+          stage = random.nextDouble() < 0.6 ? 1 : 2; // Mostly N2, some N1
+        } else if (cyclePosition < 0.7) {
+          stage = random.nextDouble() < 0.5 ? 3 : 1; // REM or N2
+        } else {
+          stage = random.nextDouble() < 0.2 ? 0 : 1; // Less N3, mostly N2
+        }
+      } else {
+        // Final third: More REM and brief awakenings
+        if (cyclePosition < 0.2) {
+          stage = random.nextDouble() < 0.1 ? 4 : 2; // Brief awakenings or N1
+        } else if (cyclePosition < 0.8) {
+          stage = random.nextDouble() < 0.6 ? 3 : 2; // More REM or N1
+        } else {
+          stage = random.nextDouble() < 0.7 ? 1 : 2; // N2 or N1
+        }
+      }
+      
+      // Add some natural variation
+      if (random.nextDouble() < 0.1) {
+        stage = [0, 1, 2, 3, 4][random.nextInt(5)];
+      }
+      
+      data.add(SleepStageData(
+        startTime.add(Duration(minutes: currentMinute)),
+        stage,
+      ));
+      
+      currentMinute += intervalMinutes;
+    }
+    
+    return data;
   }
 
   @override
@@ -111,7 +159,7 @@ class SleepStageChartWidget extends StatelessWidget {
           minX: 0,
           maxX: 8,
           minY: 0,
-          maxY: 3,
+          maxY: 4,
           titlesData: FlTitlesData(
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
@@ -120,10 +168,11 @@ class SleepStageChartWidget extends StatelessWidget {
                 interval: 1,
                 getTitlesWidget: (value, meta) {
                   const stageLabels = {
-                    3: 'Awake',
-                    2: 'REM',
-                    1: 'Light',
-                    0: 'Deep',
+                    4: 'Awake',
+                    3: 'REM',
+                    2: 'N1',
+                    1: 'N2',
+                    0: 'N3',
                   };
                   final label = stageLabels[value.toInt()] ?? '';
                   return Padding(
@@ -167,7 +216,7 @@ class SleepStageChartWidget extends StatelessWidget {
 
 class SleepStageData {
   final DateTime time;
-  final int stage; // 3: Awake, 2: REM, 1: Light, 0: Deep
+  final int stage; // 4: Awake, 3: REM, 2: N1, 1: N2, 0: N3
 
   SleepStageData(this.time, this.stage);
 }

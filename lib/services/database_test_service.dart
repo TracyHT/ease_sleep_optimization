@@ -388,14 +388,14 @@ class DatabaseTestService {
           dataFilePath: '/data/eeg/session_$sessionId.csv',
         );
         
-        // Add sleep quality metrics
+        // Add sleep quality metrics (as percentages)
         await LocalDatabaseService.saveSleepQualityMetrics(
           sessionId: sessionId,
-          timeInWake: 0.10 + random.nextDouble() * 0.10,
-          timeInN1: 0.05 + random.nextDouble() * 0.05,
-          timeInN2: 0.40 + random.nextDouble() * 0.10,
-          timeInN3: 0.15 + random.nextDouble() * 0.10,
-          timeInREM: 0.15 + random.nextDouble() * 0.10,
+          timeInWake: 10.0 + random.nextDouble() * 10.0, // 10-20%
+          timeInN1: 5.0 + random.nextDouble() * 5.0,    // 5-10%
+          timeInN2: 40.0 + random.nextDouble() * 10.0,  // 40-50%
+          timeInN3: 15.0 + random.nextDouble() * 10.0,  // 15-25%
+          timeInREM: 15.0 + random.nextDouble() * 10.0, // 15-25%
         );
         
         // Add environmental data
@@ -409,14 +409,15 @@ class DatabaseTestService {
           );
         }
         
-        // Add sleep stage scoring
-        final stages = ['Wake', 'N1', 'N2', 'N3', 'REM'];
+        // Add realistic sleep stage scoring (20 epochs = 10 minutes, representing 8 hours of sleep)
+        // Each epoch represents 24 minutes of sleep (8 hours / 20 epochs = 24 min per epoch)
+        final realisticStages = _generateRealisticSleepStages(random, day);
         for (int epoch = 0; epoch < 20; epoch++) {
           await LocalDatabaseService.saveSleepStageScoring(
             sessionId: sessionId,
             epochIndex: epoch,
-            confidence: random.nextInt(100) + 1,
-            sleepStage: stages[random.nextInt(stages.length)],
+            confidence: 85 + random.nextInt(15), // High confidence (85-99%)
+            sleepStage: realisticStages[epoch],
           );
         }
       }
@@ -425,6 +426,66 @@ class DatabaseTestService {
     } catch (e) {
       print('❌ Failed to generate sample data: $e');
     }
+  }
+
+  /// Generate realistic sleep stages for sample data
+  static List<String> _generateRealisticSleepStages(Random random, int dayOffset) {
+    // Use day offset to create different but consistent patterns
+    final seedModifier = dayOffset * 137; // Prime number for variation
+    final seededRandom = Random(random.nextInt(1000) + seedModifier);
+    
+    // Create a realistic 8-hour sleep progression over 20 epochs
+    final stages = <String>[];
+    
+    for (int epoch = 0; epoch < 20; epoch++) {
+      final sleepProgress = epoch / 19.0; // 0.0 to 1.0
+      final cyclePosition = (epoch % 4) / 4.0; // 4 epochs per cycle
+      
+      String stage;
+      
+      if (epoch == 0) {
+        // Always start awake
+        stage = 'Wake';
+      } else if (sleepProgress < 0.1) {
+        // Initial falling asleep (5% of night)
+        stage = seededRandom.nextDouble() < 0.7 ? 'N1' : 'Wake';
+      } else if (sleepProgress < 0.4) {
+        // First third: More deep sleep
+        if (cyclePosition < 0.5) {
+          stage = seededRandom.nextDouble() < 0.4 ? 'N3' : 'N2';
+        } else {
+          stage = seededRandom.nextDouble() < 0.3 ? 'REM' : 'N1';
+        }
+      } else if (sleepProgress < 0.8) {
+        // Middle third: Mixed sleep
+        double rand = seededRandom.nextDouble();
+        if (rand < 0.3) {
+          stage = 'REM';
+        } else if (rand < 0.6) {
+          stage = 'N2';
+        } else if (rand < 0.8) {
+          stage = 'N1';
+        } else {
+          stage = 'N3';
+        }
+      } else {
+        // Final third: More REM and light sleep
+        if (cyclePosition < 0.6) {
+          stage = seededRandom.nextDouble() < 0.5 ? 'REM' : 'N1';
+        } else {
+          stage = seededRandom.nextDouble() < 0.1 ? 'Wake' : 'N2';
+        }
+      }
+      
+      // Add occasional brief awakenings (5% chance)
+      if (epoch > 2 && epoch < 18 && seededRandom.nextDouble() < 0.05) {
+        stage = 'Wake';
+      }
+      
+      stages.add(stage);
+    }
+    
+    return stages;
   }
 
   /// Get database statistics

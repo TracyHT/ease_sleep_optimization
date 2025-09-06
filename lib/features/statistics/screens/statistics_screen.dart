@@ -103,7 +103,7 @@ class StatisticsScreen extends ConsumerWidget {
                             child: CircularProgressIndicator(),
                           );
                         }
-                        return snapshot.data ?? SleepStageChartWidget.mock();
+                        return snapshot.data ?? SleepStageChartWidget.mock(selectedDate: selectedDate);
                       },
                     );
                   },
@@ -209,7 +209,7 @@ class StatisticsScreen extends ConsumerWidget {
   Future<Widget> _buildSleepStageChart(DateTime selectedDate) async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
-      return SleepStageChartWidget.mock();
+      return SleepStageChartWidget.mock(selectedDate: selectedDate);
     }
 
     try {
@@ -225,7 +225,7 @@ class StatisticsScreen extends ConsumerWidget {
           }).toList();
 
       if (sessions.isEmpty) {
-        return SleepStageChartWidget.mock();
+        return SleepStageChartWidget.mock(selectedDate: selectedDate);
       }
 
       // Get sleep stage scoring for the main session
@@ -235,7 +235,7 @@ class StatisticsScreen extends ConsumerWidget {
       final stageScoring = LocalDatabaseService.getSleepStageScoring(sessionId);
 
       if (stageScoring.isEmpty) {
-        return SleepStageChartWidget.mock();
+        return SleepStageChartWidget.mock(selectedDate: selectedDate);
       }
 
       return SleepStageChartWidget.fromDatabase(
@@ -244,7 +244,7 @@ class StatisticsScreen extends ConsumerWidget {
       );
     } catch (e) {
       print('Error building sleep stage chart: $e');
-      return SleepStageChartWidget.mock();
+      return SleepStageChartWidget.mock(selectedDate: selectedDate);
     }
   }
 

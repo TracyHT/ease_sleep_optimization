@@ -1,6 +1,5 @@
 import 'package:ease_sleep_optimization/core/styles/button_styles.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import '../../../core/constants/app_spacings.dart';
 import '../../../ui/components/buttons/primary_button.dart';
 import '../../../ui/components/gradient_background.dart';
