@@ -295,7 +295,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       'Database CMS',
                       style: TextStyle(color: colorScheme.secondary),
                     ),
-                    trailing: Icon(Iconsax.archive_book, color: colorScheme.secondary),
+                    trailing: Icon(
+                      Iconsax.archive_book,
+                      color: colorScheme.secondary,
+                    ),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -364,6 +367,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 }
 
+// ignore: unused_element
 class _StatCard extends StatelessWidget {
   final String title;
   final String value;

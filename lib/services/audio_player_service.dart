@@ -57,11 +57,41 @@ class AudioPlayerService {
       // Stop current playback if any
       await _audioPlayer.stop();
       
-      // Try to play the sound, with fallback for missing files
+      // Try to play the sound, handling different audio sources
       try {
-        await _audioPlayer.play(AssetSource(sound.audioPath));
-      } catch (assetError) {
-        print('Audio file not found: ${sound.audioPath}, simulating playback');
+        // Check if it's a URL (from database/server) or local asset
+        if (sound.audioPath.startsWith('http://') || sound.audioPath.startsWith('https://')) {
+          // Remote URL from server
+          await _audioPlayer.play(UrlSource(sound.audioPath));
+        } else {
+          // Handle MongoDB relative paths and local assets
+          // Files are now in assets/audio/ directory
+          String assetPath;
+          
+          if (sound.audioPath.startsWith('assets/')) {
+            // Already has assets/ prefix - use as is
+            assetPath = sound.audioPath;
+          } else if (sound.audioPath.startsWith('audio/')) {
+            // MongoDB path format - already perfect for AssetSource
+            // AssetSource will add "assets/" making it "assets/audio/rain_heavy.mp3"
+            assetPath = sound.audioPath;
+          } else if (sound.audioPath.startsWith('lib/assets/')) {
+            // Old format from fallback data - strip lib/assets/ and keep audio/
+            assetPath = sound.audioPath.substring(11); // Remove "lib/assets/"
+          } else {
+            // Default - assume it's just the filename
+            assetPath = 'audio/${sound.audioPath}';
+          }
+          
+          // Debug logging
+          print('Playing audio - Original: ${sound.audioPath} -> Asset path for AssetSource: $assetPath');
+          
+          // AssetSource will prepend "assets/" to make "assets/audio/file.mp3"
+          await _audioPlayer.play(AssetSource(assetPath));
+        }
+      } catch (audioError) {
+        print('Audio file not found or failed to play: ${sound.audioPath}');
+        print('Error: $audioError');
         // For demo purposes, simulate playback even without actual audio files
         _isPlaying = true;
         

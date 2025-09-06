@@ -9,6 +9,7 @@ import '../providers/sleep_sounds_provider.dart';
 import '../providers/audio_player_provider.dart';
 import '../../../core/models/sleep_sound.dart';
 import '../../../ui/components/gradient_background.dart';
+import 'sound_list_screen.dart';
 
 class SleepaidsScreens extends ConsumerWidget {
   const SleepaidsScreens({super.key});
@@ -60,7 +61,15 @@ class SleepaidsScreens extends ConsumerWidget {
                               title: "Recently Play",
                               nav: "More",
                               onTap: () {
-                                // navigate to Recently Played screen
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => const SoundListScreen(
+                                          categoryTitle: "Recently Played",
+                                          categoryName: "Recently Play",
+                                        ),
+                                  ),
+                                );
                               },
                             ),
                             _buildHorizontalList(
@@ -76,14 +85,34 @@ class SleepaidsScreens extends ConsumerWidget {
                             SectionHeading(
                               title: "Suggested for you",
                               nav: "More",
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => const SoundListScreen(
+                                          categoryTitle: "Suggested Sounds",
+                                          categoryName: "Nature",
+                                        ),
+                                  ),
+                                );
+                              },
                             ),
                             const LargeSuggestionCard(),
 
                             SectionHeading(
                               title: "White Noise",
                               nav: "More",
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => const SoundListScreen(
+                                          categoryTitle: "White Noise",
+                                          categoryName: "White Noise",
+                                        ),
+                                  ),
+                                );
+                              },
                             ),
                             _buildHorizontalList(
                               sleepSounds
@@ -98,7 +127,17 @@ class SleepaidsScreens extends ConsumerWidget {
                             SectionHeading(
                               title: "Meditation",
                               nav: "More",
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => const SoundListScreen(
+                                          categoryTitle: "Meditation",
+                                          categoryName: "Meditation",
+                                        ),
+                                  ),
+                                );
+                              },
                             ),
                             _buildHorizontalList(
                               sleepSounds
@@ -112,6 +151,9 @@ class SleepaidsScreens extends ConsumerWidget {
                           ],
                         ),
                       ),
+                      // Add bottom spacing for audio player when it's visible
+                      if (audioState.currentSound != null)
+                        const SizedBox(height: 200),
                     ],
                   ),
                 ),
