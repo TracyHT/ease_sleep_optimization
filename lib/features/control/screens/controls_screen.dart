@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import '../../../core/constants/app_spacings.dart';
 import '../providers/controls_provider.dart';
 import '../../../ui/components/gradient_background.dart';
+import '../../sleepMode/screens/brain_monitoring_screen.dart';
 
 class ControlsScreen extends ConsumerWidget {
   const ControlsScreen({super.key});
@@ -79,6 +80,14 @@ class ControlsScreen extends ConsumerWidget {
                               ref
                                   .read(controlsProvider.notifier)
                                   .disconnectBrainBit(),
+                      onViewSignals: (controls['brainbitStatus'] ?? 'Disconnected').toLowerCase() == 'connected'
+                          ? () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const BrainMonitoringScreen(),
+                                ),
+                              )
+                          : null,
                     ),
                   ],
                 ),
@@ -303,6 +312,7 @@ class _DeviceConnectionCard extends StatelessWidget {
   final IconData icon;
   final VoidCallback onConnect;
   final VoidCallback onDisconnect;
+  final VoidCallback? onViewSignals;
 
   const _DeviceConnectionCard({
     required this.deviceName,
@@ -311,6 +321,7 @@ class _DeviceConnectionCard extends StatelessWidget {
     required this.icon,
     required this.onConnect,
     required this.onDisconnect,
+    this.onViewSignals,
   });
 
   @override
@@ -416,48 +427,74 @@ class _DeviceConnectionCard extends StatelessWidget {
               ),
             )
           else
-            // Connected - Show Disconnect and Settings
-            Row(
+            // Connected - Show buttons
+            Column(
               children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed:
-                        () => _showDisconnectDialog(
-                          context,
-                          deviceName,
-                          onDisconnect,
-                        ),
-                    icon: const Icon(Iconsax.close_circle, size: 16),
-                    label: const Text(
-                      'Disconnect',
-                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.withValues(alpha: 0.2),
-                      foregroundColor: Colors.red,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _showDeviceSettings(context, deviceName),
-                    icon: const Icon(Iconsax.setting_2, size: 16),
-                    label: const Text(
-                      'Settings',
-                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.colorScheme.secondary.withValues(
-                        alpha: 0.2,
+                // View Signals button (for BrainBit only)
+                if (onViewSignals != null) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: onViewSignals,
+                      icon: const Icon(Iconsax.chart, size: 16),
+                      label: const Text(
+                        'View Live Signals',
+                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                       ),
-                      foregroundColor: theme.colorScheme.secondary,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.8),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
                     ),
                   ),
+                  const SizedBox(height: 8),
+                ],
+                // Disconnect and Settings row
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed:
+                            () => _showDisconnectDialog(
+                              context,
+                              deviceName,
+                              onDisconnect,
+                            ),
+                        icon: const Icon(Iconsax.close_circle, size: 16),
+                        label: const Text(
+                          'Disconnect',
+                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.withValues(alpha: 0.2),
+                          foregroundColor: Colors.red,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _showDeviceSettings(context, deviceName),
+                        icon: const Icon(Iconsax.setting_2, size: 16),
+                        label: const Text(
+                          'Settings',
+                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.secondary.withValues(
+                            alpha: 0.2,
+                          ),
+                          foregroundColor: theme.colorScheme.secondary,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
