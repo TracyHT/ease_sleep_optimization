@@ -5,6 +5,7 @@ import '../../../core/constants/app_spacings.dart';
 import '../providers/controls_provider.dart';
 import '../../../ui/components/gradient_background.dart';
 import '../../sleepMode/screens/brain_monitoring_screen.dart';
+import '../../brainbit/screens/brainbit_connection_screen.dart';
 
 class ControlsScreen extends ConsumerWidget {
   const ControlsScreen({super.key});
@@ -407,24 +408,50 @@ class _DeviceConnectionCard extends StatelessWidget {
           // Action Buttons
           if (!isConnected)
             // Connect Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: onConnect,
-                icon: const Icon(Iconsax.link, size: 16),
-                label: const Text(
-                  'Connect Device',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary.withValues(
-                    alpha: 0.5,
+            Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const BrainBitConnectionScreen(),
+                      ),
+                    ),
+                    icon: const Icon(Iconsax.bluetooth, size: 16),
+                    label: const Text(
+                      'Connect via Bluetooth',
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.primary.withValues(
+                        alpha: 0.8,
+                      ),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
                   ),
-                  foregroundColor: theme.colorScheme.onPrimaryContainer,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-              ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: onConnect,
+                    icon: const Icon(Iconsax.link, size: 16),
+                    label: const Text(
+                      'Quick Connect (Demo)',
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: theme.colorScheme.primary,
+                      side: BorderSide(color: theme.colorScheme.primary),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                  ),
+                ),
+              ],
             )
           else
             // Connected - Show buttons

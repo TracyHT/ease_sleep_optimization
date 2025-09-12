@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:neurosdk2/neurosdk2.dart';
 import '../../../ui/components/gradient_background.dart';
-import '../widgets/signal_chart_widget.dart';
+import '../widgets/real_signal_chart_widget.dart';
 
 class BrainMonitoringScreen extends StatefulWidget {
-  const BrainMonitoringScreen({super.key});
+  final BrainBit2? sensor;
+  
+  const BrainMonitoringScreen({super.key, this.sensor});
 
   @override
   State<BrainMonitoringScreen> createState() => _BrainMonitoringScreenState();
@@ -162,7 +165,8 @@ class _BrainMonitoringScreenState extends State<BrainMonitoringScreen> {
                   child: Column(
                     children: [
                       // Brain Activity Chart
-                      SignalChartWidget(
+                      RealSignalChartWidget(
+                        sensor: widget.sensor,
                         isActive: _isMonitoring,
                         title: "EEG Brain Signals",
                         channelNames: const [
@@ -174,10 +178,11 @@ class _BrainMonitoringScreenState extends State<BrainMonitoringScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Vital Signs Chart
-                      SignalChartWidget(
+                      // Vital Signs Chart (simulated for now)
+                      RealSignalChartWidget(
+                        sensor: null, // No real sensor for vital signs yet
                         isActive: _isMonitoring,
-                        title: "Vital Signs",
+                        title: "Vital Signs (Simulated)",
                         channelNames: const [
                           "Heart Rate",
                           "Breathing Rate",

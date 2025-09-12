@@ -2,32 +2,38 @@ import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:neurosdk2/neurosdk2.dart';
 import 'dynamic_chart_data.dart';
 
-class SignalChartWidget extends StatefulWidget {
+class RealSignalChartWidget extends StatefulWidget {
+  final BrainBit2? sensor;
   final bool isActive;
   final String title;
   final List<String> channelNames;
 
-  const SignalChartWidget({
+  const RealSignalChartWidget({
     super.key,
+    this.sensor,
     this.isActive = false,
     this.title = "Sleep Signals",
     this.channelNames = const ["Brain Activity", "Heart Rate", "Breathing"],
   });
 
   @override
-  State<SignalChartWidget> createState() => _SignalChartWidgetState();
+  State<RealSignalChartWidget> createState() => _RealSignalChartWidgetState();
 }
 
-class _SignalChartWidgetState extends State<SignalChartWidget> {
+class _RealSignalChartWidgetState extends State<RealSignalChartWidget> {
   static const double windowLength = 2000;
   static const List<double> amplitudeList = [50, 100, 200];
   double currentAmplitude = amplitudeList[1];
 
+  List<FEEGChannelInfo?> channels = [];
   List<DynamicChartData> chartDataList = [];
+  StreamSubscription? signalSubscription;
   Timer? _simulationTimer;
   bool _isSimulating = false;
+  bool _isConnected = false;
 
   final List<Color> channelColors = [
     Color(0xFF4E616D), // Brain Activity - Blue-gray
@@ -45,28 +51,102 @@ class _SignalChartWidgetState extends State<SignalChartWidget> {
     super.initState();
     initChannels();
     if (widget.isActive) {
-      startSimulation();
+      startMonitoring();
     }
   }
 
   @override
-  void didUpdateWidget(SignalChartWidget oldWidget) {
+  void didUpdateWidget(RealSignalChartWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.isActive != oldWidget.isActive) {
       if (widget.isActive) {
-        startSimulation();
+        startMonitoring();
       } else {
-        stopSimulation();
+        stopMonitoring();
+      }
+    }
+    
+    if (widget.sensor != oldWidget.sensor) {
+      initChannels();
+      if (widget.isActive) {
+        startMonitoring();
       }
     }
   }
 
-  void initChannels() {
+  Future<void> initChannels() async {
     chartDataList.clear();
-    for (int i = 0; i < widget.channelNames.length; i++) {
+    
+    if (widget.sensor != null) {
+      try {
+        channels = await widget.sensor!.supportedChannels.value;
+        _isConnected = true;
+      } catch (e) {
+        print('Error getting channels: $e');
+        channels = [];
+        _isConnected = false;
+      }
+    } else {
+      channels = [];
+      _isConnected = false;
+    }
+
+    // Create chart data for available channels or fallback channels
+    int channelCount = channels.isNotEmpty ? channels.length : widget.channelNames.length;
+    for (int i = 0; i < channelCount; i++) {
       chartDataList.add(DynamicChartData(windowLength)..start());
     }
-    setState(() {});
+    
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void startMonitoring() {
+    if (_isSimulating || signalSubscription != null) return;
+
+    if (widget.sensor != null && _isConnected) {
+      // Use real sensor data
+      startRealSignalMonitoring();
+    } else {
+      // Fall back to simulation for testing
+      startSimulation();
+    }
+  }
+
+  void startRealSignalMonitoring() {
+    try {
+      signalSubscription = widget.sensor!.signalDataStream.listen(
+        processRealSignals,
+        onError: (error) {
+          print('Signal stream error: $error');
+          // Fall back to simulation on error
+          signalSubscription?.cancel();
+          signalSubscription = null;
+          startSimulation();
+        },
+      );
+      
+      widget.sensor!.execute(FSensorCommand.startSignal);
+      print('Started real signal monitoring');
+    } catch (e) {
+      print('Error starting real signals: $e');
+      startSimulation();
+    }
+  }
+
+  void processRealSignals(List<SignalChannelsData> event) {
+    for (int i = 0; i < channels.length && i < chartDataList.length; i++) {
+      final ch = channels[i];
+      if (ch == null) continue;
+
+      final samples = event[ch.num].samples;
+      chartDataList[i].add(samples);
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void startSimulation() {
@@ -89,15 +169,33 @@ class _SignalChartWidgetState extends State<SignalChartWidget> {
     });
   }
 
+  void stopMonitoring() {
+    stopSimulation();
+    stopRealSignals();
+  }
+
   void stopSimulation() {
     _isSimulating = false;
     _simulationTimer?.cancel();
     _simulationTimer = null;
   }
 
+  void stopRealSignals() {
+    signalSubscription?.cancel();
+    signalSubscription = null;
+    
+    if (widget.sensor != null) {
+      try {
+        widget.sensor!.execute(FSensorCommand.stopSignal);
+      } catch (e) {
+        print('Error stopping signal: $e');
+      }
+    }
+  }
+
   @override
   void dispose() {
-    stopSimulation();
+    stopMonitoring();
     for (var chartData in chartDataList) {
       chartData.dispose();
     }
@@ -126,8 +224,8 @@ class _SignalChartWidgetState extends State<SignalChartWidget> {
           Row(
             children: [
               Icon(
-                Iconsax.chart,
-                color: colorScheme.primary,
+                _isConnected ? Iconsax.activity : Iconsax.chart,
+                color: _isConnected ? Colors.green : colorScheme.primary,
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -144,17 +242,27 @@ class _SignalChartWidgetState extends State<SignalChartWidget> {
                 height: 8,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: widget.isActive ? Colors.green : Colors.grey,
+                  color: widget.isActive ? (_isConnected ? Colors.green : Colors.orange) : Colors.grey,
                 ),
               ),
               const SizedBox(width: 8),
               Text(
-                widget.isActive ? "Active" : "Inactive",
+                _getStatusText(),
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: widget.isActive ? Colors.green : Colors.grey,
+                  color: widget.isActive ? (_isConnected ? Colors.green : Colors.orange) : Colors.grey,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 8),
+          
+          // Connection Status
+          Text(
+            _isConnected ? "Real BrainBit Data" : "Simulated Data",
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: _isConnected ? Colors.green : Colors.orange,
+              fontStyle: FontStyle.italic,
+            ),
           ),
           const SizedBox(height: 16),
 
@@ -200,11 +308,11 @@ class _SignalChartWidgetState extends State<SignalChartWidget> {
               ),
             )
           else ...[
-            for (int i = 0; i < widget.channelNames.length && i < chartDataList.length; i++) ...[
-              buildChannelInfo(widget.channelNames[i], chartDataList[i], channelColors[i % channelColors.length]),
+            for (int i = 0; i < _getDisplayChannelNames().length && i < chartDataList.length; i++) ...[
+              buildChannelInfo(_getDisplayChannelNames()[i], chartDataList[i], channelColors[i % channelColors.length]),
               const SizedBox(height: 8),
               buildChart(chartDataList[i], channelColors[i % channelColors.length]),
-              if (i < widget.channelNames.length - 1) const SizedBox(height: 16),
+              if (i < _getDisplayChannelNames().length - 1) const SizedBox(height: 16),
             ],
           ],
           
@@ -213,7 +321,7 @@ class _SignalChartWidgetState extends State<SignalChartWidget> {
               padding: const EdgeInsets.only(top: 16),
               child: Center(
                 child: Text(
-                  "Start sleep session to begin signal monitoring",
+                  "Start monitoring to begin signal visualization",
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: Colors.white54,
                     fontStyle: FontStyle.italic,
@@ -224,6 +332,20 @@ class _SignalChartWidgetState extends State<SignalChartWidget> {
         ],
       ),
     );
+  }
+
+  List<String> _getDisplayChannelNames() {
+    if (channels.isNotEmpty) {
+      return channels.map((ch) => ch?.name ?? "Unknown").toList();
+    }
+    return widget.channelNames;
+  }
+
+  String _getStatusText() {
+    if (!widget.isActive) return "Inactive";
+    if (_isConnected && signalSubscription != null) return "Live Data";
+    if (_isSimulating) return "Simulated";
+    return "Starting...";
   }
 
   Widget buildChannelInfo(String name, DynamicChartData data, Color color) {

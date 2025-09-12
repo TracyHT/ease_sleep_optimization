@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'dart:ui';
-import '../../../core/models/sleep_sound.dart';
 import '../providers/audio_player_provider.dart';
 
 class ModernAudioPlayer extends ConsumerStatefulWidget {
