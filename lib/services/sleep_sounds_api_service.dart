@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import '../core/models/sleep_sound.dart';
 
 class SleepSoundsApiService {
-  static const String baseUrl = 'http://localhost:3000/api/sleep-sounds';
+  static const String baseUrl = 'http://192.168.1.102:3000/api/sleep-sounds';
   
   // Get all sleep sounds
   static Future<List<SleepSound>> getAllSleepSounds({

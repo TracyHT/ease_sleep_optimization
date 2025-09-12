@@ -6,7 +6,7 @@ import '../core/models/user.dart';
 class ApiService {
   static final String baseUrl = Platform.isAndroid
       ? 'http://10.0.2.2:3000/api'          // Android emulator
-      : 'http://localhost:3000/api';        // iOS simulator/Mac testing
+      : 'http://192.168.1.102:3000/api';    // iOS device/Mac IP testing
 
   Future<AppUser?> getUser(String uid) async {
     final response = await http.get(Uri.parse('$baseUrl/users/$uid'));
