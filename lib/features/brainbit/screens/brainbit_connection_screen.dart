@@ -137,6 +137,40 @@ class _BrainBitConnectionScreenState extends ConsumerState<BrainBitConnectionScr
             textAlign: TextAlign.center,
           ),
 
+          // Battery Level (if connected and available)
+          if (state.hasConnectedDevice && state.connectedDevice?.batteryLevel != null) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    _getBatteryIcon(state.connectedDevice!.batteryLevel!),
+                    color: _getBatteryColor(state.connectedDevice!.batteryLevel!),
+                    size: 16,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Battery: ${state.connectedDevice!.batteryLevel}%',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: _getBatteryColor(state.connectedDevice!.batteryLevel!),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
           // Error Message (if any)
           if (state.errorMessage != null) ...[
             const SizedBox(height: 12),
@@ -405,5 +439,19 @@ class _BrainBitConnectionScreenState extends ConsumerState<BrainBitConnectionScr
     if (state.isScanning) return "Scanning for Devices";
     if (state.errorMessage != null) return "Connection Error";
     return "BrainBit Disconnected";
+  }
+
+  /// Gets battery icon based on level
+  IconData _getBatteryIcon(int batteryLevel) {
+    if (batteryLevel >= 50) return Iconsax.battery_full;
+    if (batteryLevel >= 25) return Iconsax.battery_charging;
+    return Iconsax.battery_empty;
+  }
+
+  /// Gets battery color based on level
+  Color _getBatteryColor(int batteryLevel) {
+    if (batteryLevel >= 50) return Colors.green;
+    if (batteryLevel >= 25) return Colors.orange;
+    return Colors.red;
   }
 }

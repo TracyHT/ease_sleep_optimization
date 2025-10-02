@@ -27,8 +27,8 @@ import 'brainbit_scanner_service.dart';
 
 /// Service for managing BrainBit device connections
 class BrainBitConnectionService {
-  /// Currently connected BrainBit2 sensor
-  BrainBit2? _connectedSensor;
+  /// Currently connected BrainBit sensor
+  BrainBit? _connectedSensor;
   
   /// Scanner service used for device creation
   BrainBitScannerService? _scannerService;
@@ -45,7 +45,7 @@ class BrainBitConnectionService {
       StreamController<BrainBitDeviceInfo>.broadcast();
 
   /// Current connected sensor (null if not connected)
-  BrainBit2? get connectedSensor => _connectedSensor;
+  BrainBit? get connectedSensor => _connectedSensor;
   
   /// Current connection state
   BrainBitConnectionStatus get connectionState => _connectionState;
@@ -87,11 +87,11 @@ class BrainBitConnectionService {
       // Create sensor from device info
       final sensor = await _scannerService!.scanner!.createSensor(deviceInfo);
       
-      if (sensor is! BrainBit2) {
-        throw const BrainBitConnectionException('Connected device is not BrainBit2');
+      if (sensor is! BrainBit) {
+        throw const BrainBitConnectionException('Connected device is not BrainBit');
       }
       
-      _connectedSensor = sensor;
+      _connectedSensor = sensor as BrainBit;
       
       // Configure the device
       await _configureDevice(sensor);
@@ -111,20 +111,10 @@ class BrainBitConnectionService {
   }
 
   /// Configures the BrainBit device with optimal settings
-  Future<void> _configureDevice(BrainBit2 sensor) async {
+  Future<void> _configureDevice(BrainBit sensor) async {
     try {
-      // Get channel count
-      final channelCount = await sensor.channelsCount.value;
-      
-      // Configure amplifier parameters for optimal EEG recording
-      final amplifierParams = BrainBit2AmplifierParam(
-        chSignalMode: List.filled(channelCount, FBrainBit2ChannelMode.chModeNormal),
-        chResistUse: List.filled(channelCount, true), // Enable resistance monitoring
-        chGain: List.filled(channelCount, FSensorGain.gain3), // 3x gain for EEG
-        current: FGenCurrent.genCurr6nA, // 6nA current for resistance check
-      );
-      
-      await sensor.amplifierParam.set(amplifierParams);
+      // Configure gain for optimal EEG recording
+      await sensor.gain.set(FSensorGain.gain3);
       
     } catch (e) {
       throw BrainBitConnectionException('Failed to configure device: ${e.toString()}');
@@ -132,7 +122,7 @@ class BrainBitConnectionService {
   }
 
   /// Updates device information
-  Future<void> _updateDeviceInfo(BrainBit2 sensor) async {
+  Future<void> _updateDeviceInfo(BrainBit sensor) async {
     try {
       final info = BrainBitDeviceInfo(
         serialNumber: await sensor.serialNumber.value,
@@ -153,7 +143,7 @@ class BrainBitConnectionService {
   /// Starts EEG signal streaming
   /// 
   /// Returns the signal data stream
-  Stream<List<SignalChannelsData>>? startSignalStream() {
+  Stream<List<BrainBitSignalData>>? startSignalStream() {
     if (_connectedSensor == null) {
       throw const BrainBitConnectionException('No device connected');
     }
@@ -178,7 +168,7 @@ class BrainBitConnectionService {
   }
 
   /// Starts resistance monitoring
-  Stream<List<ResistRefChannelsData>>? startResistanceMonitoring() {
+  Stream<BrainBitResistData>? startResistanceMonitoring() {
     if (_connectedSensor == null) {
       throw const BrainBitConnectionException('No device connected');
     }
