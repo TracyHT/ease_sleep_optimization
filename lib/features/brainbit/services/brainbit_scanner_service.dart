@@ -81,8 +81,8 @@ class BrainBitScannerService {
       
       // Create scanner for BrainBit devices
       _scanner = await Scanner.create([
-        FSensorFamily.leBrainBit2,
-        FSensorFamily.leBrainBitFlex,
+        FSensorFamily.leBrainBit,
+        FSensorFamily.leBrainBitBlack,
       ]);
       
       // Start the neurosdk2 scanner
@@ -135,25 +135,36 @@ class BrainBitScannerService {
         return;
       }
       
-      _updateDeviceList();
+      _updateDeviceList().catchError((e) => print('Error in device update: $e'));
     });
+    
+    // Also immediately check for devices
+    _updateDeviceList().catchError((e) => print('Error in initial device update: $e'));
   }
 
   /// Updates the device list from scanner results
-  void _updateDeviceList() {
+  Future<void> _updateDeviceList() async {
     try {
-      // The neurosdk2 Scanner automatically discovers devices during scanning
-      // Real devices will be added via the addDiscoveredDevice method
-      // when the actual BrainBit discovery mechanism is triggered
+      if (_scanner == null) return;
       
-      // For now, this method serves as a heartbeat to keep the UI updated
-      // In a real implementation, the Scanner would notify us of discoveries
-      // through events or callbacks that would call addDiscoveredDevice()
+      // Get current sensors from scanner
+      final sensors = await _scanner!.getSensors();
       
-      // Keep current devices and notify UI of any changes
-      if (_discoveredDevices.isNotEmpty) {
-        _deviceController.add(List.from(_discoveredDevices));
+      // Clear and rebuild device list
+      _discoveredDevices.clear();
+      
+      // Convert to BrainBitDevice objects
+      for (final sensorInfo in sensors) {
+        if (sensorInfo != null) {
+          final device = BrainBitDevice.fromFSensorInfo(sensorInfo);
+          if (!_discoveredDevices.any((d) => d.id == device.id)) {
+            _discoveredDevices.add(device);
+          }
+        }
       }
+      
+      // Notify listeners
+      _deviceController.add(List.from(_discoveredDevices));
       
     } catch (e) {
       print('Error updating device list: $e');

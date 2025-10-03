@@ -5,7 +5,7 @@ import '../../../ui/components/gradient_background.dart';
 import '../widgets/real_signal_chart_widget.dart';
 
 class BrainMonitoringScreen extends StatefulWidget {
-  final BrainBit2? sensor;
+  final BrainBit? sensor;
   
   const BrainMonitoringScreen({super.key, this.sensor});
 
@@ -170,26 +170,13 @@ class _BrainMonitoringScreenState extends State<BrainMonitoringScreen> {
                         isActive: _isMonitoring,
                         title: "EEG Brain Signals",
                         channelNames: const [
-                          "Frontal Lobe",
-                          "Parietal Lobe",
-                          "Occipital Lobe",
-                          "Temporal Lobe",
+                          "O1 (Occipital Left)",
+                          "O2 (Occipital Right)",
+                          "T3 (Temporal Left)",
+                          "T4 (Temporal Right)",
                         ],
                       ),
-                      const SizedBox(height: 16),
-
-                      // Vital Signs Chart (simulated for now)
-                      RealSignalChartWidget(
-                        sensor: null, // No real sensor for vital signs yet
-                        isActive: _isMonitoring,
-                        title: "Vital Signs (Simulated)",
-                        channelNames: const [
-                          "Heart Rate",
-                          "Breathing Rate",
-                          "Body Temperature",
-                        ],
-                      ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
 
                       // Sleep Stage Analysis
                       Container(

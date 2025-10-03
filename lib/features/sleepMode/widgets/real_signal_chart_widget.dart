@@ -6,7 +6,7 @@ import 'package:neurosdk2/neurosdk2.dart';
 import 'dynamic_chart_data.dart';
 
 class RealSignalChartWidget extends StatefulWidget {
-  final BrainBit2? sensor;
+  final BrainBit? sensor;
   final bool isActive;
   final String title;
   final List<String> channelNames;
@@ -25,7 +25,7 @@ class RealSignalChartWidget extends StatefulWidget {
 
 class _RealSignalChartWidgetState extends State<RealSignalChartWidget> {
   static const double windowLength = 2000;
-  static const List<double> amplitudeList = [50, 100, 200];
+  static const List<double> amplitudeList = [50.0, 100.0, 200.0];
   double currentAmplitude = amplitudeList[1];
 
   List<FEEGChannelInfo?> channels = [];
@@ -79,8 +79,10 @@ class _RealSignalChartWidgetState extends State<RealSignalChartWidget> {
     
     if (widget.sensor != null) {
       try {
-        channels = await widget.sensor!.supportedChannels.value;
-        _isConnected = true;
+        final channelCount = await widget.sensor!.channelsCount.value;
+        // For BrainBit, create mock channel info based on channel count
+        channels = List.generate(channelCount, (index) => null); // BrainBit doesn't provide detailed channel info
+        // Don't set _isConnected here - let startRealSignalMonitoring handle it
       } catch (e) {
         print('Error getting channels: $e');
         channels = [];
@@ -105,11 +107,11 @@ class _RealSignalChartWidgetState extends State<RealSignalChartWidget> {
   void startMonitoring() {
     if (_isSimulating || signalSubscription != null) return;
 
-    if (widget.sensor != null && _isConnected) {
-      // Use real sensor data
+    if (widget.sensor != null) {
+      // Always try real sensor first if sensor is available
       startRealSignalMonitoring();
     } else {
-      // Fall back to simulation for testing
+      // Fall back to simulation only when no sensor
       startSimulation();
     }
   }
@@ -123,25 +125,56 @@ class _RealSignalChartWidgetState extends State<RealSignalChartWidget> {
           // Fall back to simulation on error
           signalSubscription?.cancel();
           signalSubscription = null;
+          _isConnected = false;
           startSimulation();
         },
       );
       
       widget.sensor!.execute(FSensorCommand.startSignal);
+      _isConnected = true;
       print('Started real signal monitoring');
     } catch (e) {
       print('Error starting real signals: $e');
+      _isConnected = false;
       startSimulation();
     }
   }
 
-  void processRealSignals(List<SignalChannelsData> event) {
-    for (int i = 0; i < channels.length && i < chartDataList.length; i++) {
-      final ch = channels[i];
-      if (ch == null) continue;
+  void processRealSignals(List<BrainBitSignalData> event) {
+    // Debug: Print sample values to check if we're getting real data
+    if (event.isNotEmpty) {
+      final sample = event.first;
+      print('EEG Values - O1: ${sample.o1}, O2: ${sample.o2}, T3: ${sample.t3}, T4: ${sample.t4}');
+    }
+    
+    // Process each channel and convert from volts to microvolts (μV)
+    List<double> samples = [];
 
-      final samples = event[ch.num].samples;
-      chartDataList[i].add(samples);
+    // Process O1 channel - convert to μV
+    samples.addAll(event.map((v) => v.o1 * 1000000));
+    if (chartDataList.isNotEmpty) {
+      chartDataList[0].add(samples);
+    }
+
+    // Process O2 channel - convert to μV
+    samples.clear();
+    samples.addAll(event.map((v) => v.o2 * 1000000));
+    if (chartDataList.length > 1) {
+      chartDataList[1].add(samples);
+    }
+
+    // Process T3 channel - convert to μV
+    samples.clear();
+    samples.addAll(event.map((v) => v.t3 * 1000000));
+    if (chartDataList.length > 2) {
+      chartDataList[2].add(samples);
+    }
+
+    // Process T4 channel - convert to μV
+    samples.clear();
+    samples.addAll(event.map((v) => v.t4 * 1000000));
+    if (chartDataList.length > 3) {
+      chartDataList[3].add(samples);
     }
 
     if (mounted) {
@@ -270,7 +303,7 @@ class _RealSignalChartWidgetState extends State<RealSignalChartWidget> {
           Row(
             children: [
               Text(
-                "Amplitude:",
+                "Amplitude (V):",
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: Colors.white70,
                 ),
@@ -289,7 +322,7 @@ class _RealSignalChartWidgetState extends State<RealSignalChartWidget> {
                   for (final value in amplitudeList)
                     ButtonSegment(
                       value: value,
-                      label: Text(value.toInt().toString()),
+                      label: Text(value.toString()),
                     ),
                 ],
                 selected: {currentAmplitude},
@@ -336,7 +369,13 @@ class _RealSignalChartWidgetState extends State<RealSignalChartWidget> {
 
   List<String> _getDisplayChannelNames() {
     if (channels.isNotEmpty) {
-      return channels.map((ch) => ch?.name ?? "Unknown").toList();
+      // For BrainBit, use the provided channel names or generate default names
+      return List.generate(
+        channels.length, 
+        (index) => index < widget.channelNames.length 
+          ? widget.channelNames[index] 
+          : "Channel ${index + 1}"
+      );
     }
     return widget.channelNames;
   }
@@ -390,8 +429,8 @@ class _RealSignalChartWidgetState extends State<RealSignalChartWidget> {
         LineChartData(
           maxY: currentAmplitude,
           minY: -currentAmplitude,
-          minX: 0,
-          maxX: windowLength,
+          minX: data.points.isNotEmpty ? data.points.first.x : 0,
+          maxX: data.points.isNotEmpty ? data.points.last.x : 200,
           lineTouchData: const LineTouchData(enabled: false),
           clipData: const FlClipData.all(),
           gridData: FlGridData(

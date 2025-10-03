@@ -110,6 +110,7 @@ class BrainBitNotifier extends StateNotifier<BrainBitState> {
   StreamSubscription? _deviceSubscription;
   StreamSubscription? _scanningSubscription;
   StreamSubscription? _connectionSubscription;
+  StreamSubscription? _deviceInfoSubscription;
 
   BrainBitNotifier() : super(const BrainBitState()) {
     _initializeServices();
@@ -155,6 +156,15 @@ class BrainBitNotifier extends StateNotifier<BrainBitState> {
             connectionState == BrainBitConnectionStatus.failed) {
           state = state.copyWith(clearConnectedDevice: true);
         }
+      }
+    });
+
+    // Listen to device info updates (battery level, etc.)
+    _deviceInfoSubscription = _connectionService.deviceInfoStream.listen((deviceInfo) {
+      final device = state.connectedDevice;
+      if (device != null) {
+        final updatedDevice = device.copyWith(batteryLevel: deviceInfo.batteryLevel);
+        state = state.copyWith(connectedDevice: updatedDevice);
       }
     });
   }
@@ -265,10 +275,10 @@ class BrainBitNotifier extends StateNotifier<BrainBitState> {
   }
 
   /// Gets the connected sensor for signal streaming
-  BrainBit2? get connectedSensor => _connectionService.connectedSensor;
+  BrainBit? get connectedSensor => _connectionService.connectedSensor;
 
   /// Starts signal streaming from connected device
-  Stream<List<SignalChannelsData>>? startSignalStream() {
+  Stream<List<BrainBitSignalData>>? startSignalStream() {
     try {
       return _connectionService.startSignalStream();
     } catch (e) {
@@ -317,6 +327,7 @@ class BrainBitNotifier extends StateNotifier<BrainBitState> {
   void dispose() {
     _deviceSubscription?.cancel();
     _scanningSubscription?.cancel();
+    _deviceInfoSubscription?.cancel();
     _connectionSubscription?.cancel();
     
     _scannerService.dispose();

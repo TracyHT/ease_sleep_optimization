@@ -24,13 +24,17 @@ class DynamicChartData {
 
   void add(List<double> values) {
     for (double value in values) {
-      if (_points.length > windowLength / 10) {
+      // Keep a rolling window of points
+      if (_points.length > 200) { // Limit points for performance
         _points.removeAt(0);
+        // Shift all points left
         for (int i = 0; i < _points.length; i++) {
-          _points[i] = FlSpot(_points[i].x - 10, _points[i].y);
+          _points[i] = FlSpot(_points[i].x - 1, _points[i].y);
         }
+        _currentTime = _points.isNotEmpty ? _points.last.x + 1 : 0;
       }
       _points.add(FlSpot(_currentTime, value));
+      _currentTime += 1;
     }
   }
 
