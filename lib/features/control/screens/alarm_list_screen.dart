@@ -5,6 +5,8 @@ import '../../../core/models/alarm.dart';
 import '../../../ui/components/gradient_background.dart';
 import '../providers/alarm_provider.dart';
 import 'add_edit_alarm_screen.dart';
+import 'alarm_ringing_screen.dart';
+import '../../../services/alarm_service.dart';
 
 class AlarmListScreen extends ConsumerStatefulWidget {
   const AlarmListScreen({super.key});
@@ -45,6 +47,10 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Iconsax.alarm5, color: Colors.white),
+            onPressed: () => _testAlarm(),
+          ),
           IconButton(
             icon: const Icon(Iconsax.add, color: Colors.white),
             onPressed: () {
@@ -321,5 +327,59 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> {
         ],
       ),
     );
+  }
+
+  /// Test alarm functionality with immediate alarm
+  void _testAlarm() async {
+    // Create a test alarm for immediate testing
+    final testAlarm = Alarm(
+      id: 'test_${DateTime.now().millisecondsSinceEpoch}',
+      time: '${DateTime.now().hour.toString().padLeft(2, '0')}:${(DateTime.now().minute + 1).toString().padLeft(2, '0')}',
+      label: 'Test Alarm',
+      sound: 'Gentle Rise',
+      snoozeEnabled: true,
+      snoozeDuration: 1, // 1 minute for testing
+      alarmType: 'test',
+      isActive: true,
+      repeatDays: [],
+      createdAt: DateTime.now(),
+    );
+
+    try {
+      await AlarmService.addAlarm(testAlarm);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Test alarm set for 1 minute from now!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Show alarm ringing screen immediately for UI testing
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AlarmRingingScreen(
+              alarmId: testAlarm.id,
+              title: testAlarm.label,
+              time: testAlarm.time,
+            ),
+          ),
+        );
+
+        // Also trigger an immediate alarm for testing real functionality
+        await AlarmService.showImmediateTestAlarm(testAlarm.id);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to set test alarm: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

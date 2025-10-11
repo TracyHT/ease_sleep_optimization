@@ -53,5 +53,29 @@
 	<string>This app requires location access for Bluetooth device scanning. Location data is not stored or transmitted.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app requires location access for Bluetooth device scanning. Location data is not stored or transmitted.</string>
+
+	<!-- Alarm and notification permissions -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>background-processing</string>
+		<string>background-fetch</string>
+	</array>
+
+	<!-- Permission descriptions for alarms -->
+	<key>NSUserNotificationAlertStyle</key>
+	<string>alert</string>
+
+	<!-- Notification permission description -->
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>This app requires notification access to wake you up with alarms at your scheduled times.</string>
+
+	<!-- Background app refresh description -->
+	<key>NSBackgroundRefreshStatusAvailable</key>
+	<true/>
+
+	<!-- Audio session category for alarms -->
+	<key>UIRequiresPersistentWiFi</key>
+	<false/>
 </dict>
 </plist>
