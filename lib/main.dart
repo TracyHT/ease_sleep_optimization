@@ -1,3 +1,4 @@
+import 'package:ease_sleep_optimization/core/services/api_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -15,14 +16,15 @@ import './features/control/screens/alarm_ringing_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+  ApiService.clearCache();
+
   // Initialize Hive
   await Hive.initFlutter();
   await HiveService.initialize();
-  
+
   // Initialize Firebase
   await Firebase.initializeApp();
-  
+
   // Initialize Audio Player Service
   await AudioPlayerService().initialize();
 
@@ -56,11 +58,12 @@ class _MyAppState extends State<MyApp> {
         // Show alarm ringing screen
         navigatorKey.currentState?.push(
           MaterialPageRoute(
-            builder: (_) => AlarmRingingScreen(
-              alarmId: alarm.id,
-              title: alarm.label,
-              time: alarm.time,
-            ),
+            builder:
+                (_) => AlarmRingingScreen(
+                  alarmId: alarm.id,
+                  title: alarm.label,
+                  time: alarm.time,
+                ),
             settings: const RouteSettings(name: '/alarm-ringing'),
           ),
         );

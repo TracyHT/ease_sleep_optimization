@@ -77,5 +77,14 @@
 	<!-- Audio session category for alarms -->
 	<key>UIRequiresPersistentWiFi</key>
 	<false/>
+
+	<!-- Allow HTTP connections for local API server -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

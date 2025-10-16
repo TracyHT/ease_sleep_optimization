@@ -7,79 +7,72 @@ class ApiService {
   static String? _cachedBaseUrl;
   static const int serverPort = 3000;
 
+  static const String _railwayBase =
+      'https://easesleepoptimization-production.up.railway.app/api';
+
   static Future<String> get baseUrl async {
-    if (_cachedBaseUrl != null) return _cachedBaseUrl!;
+    if (_cachedBaseUrl != null) {
+      print('Using cached API URL: $_cachedBaseUrl');
+      return _cachedBaseUrl!;
+    }
+
+    print('🌍 Discovering best API endpoint...');
 
     if (Platform.isAndroid) {
+      // Emulator Android
       _cachedBaseUrl = 'http://10.0.2.2:$serverPort/api';
-    } else {
-      // Try localhost first (for iOS Simulator)
+      print('🤖 Android emulator detected → $_cachedBaseUrl');
+    } else if (Platform.isIOS) {
+      // Try localhost for simulator
       if (await _testConnection('localhost')) {
         _cachedBaseUrl = 'http://localhost:$serverPort/api';
+        print('🧩 iOS Simulator detected → $_cachedBaseUrl');
       } else {
-        // Fallback to network discovery for physical devices
-        final networkIP = await _discoverServerIP();
-        _cachedBaseUrl = 'http://$networkIP:$serverPort/api';
+        // Real device → Railway server
+        _cachedBaseUrl = _railwayBase;
+        print(
+          '📱 Physical iOS device detected → Using Railway: $_cachedBaseUrl',
+        );
       }
+    } else {
+      // Fallback for other platforms (web, macOS, etc.)
+      _cachedBaseUrl = _railwayBase;
+      print('🖥️ Defaulting to Railway backend: $_cachedBaseUrl');
     }
 
     return _cachedBaseUrl!;
   }
 
+  /// 🧠 Test if localhost is reachable
   static Future<bool> _testConnection(String ip) async {
     try {
-      final response = await http.get(
-        Uri.parse('http://$ip:$serverPort/test'),
-      ).timeout(const Duration(seconds: 3));
-      return response.statusCode == 200;
-    } catch (e) {
+      final testUrl = 'http://$ip:$serverPort/test';
+      print('🔎 Testing connection to $testUrl');
+      final response = await http
+          .get(Uri.parse(testUrl))
+          .timeout(const Duration(seconds: 10));
+      final ok = response.statusCode == 200;
+      if (ok) print('✅ Localhost connection OK');
+      return ok;
+    } catch (_) {
+      print('❌ Localhost not reachable');
       return false;
     }
   }
 
-  static Future<String> _discoverServerIP() async {
-    // Get the device's current network subnet
-    final interfaces = await NetworkInterface.list();
-
-    for (final interface in interfaces) {
-      for (final address in interface.addresses) {
-        if (address.type == InternetAddressType.IPv4 &&
-            !address.isLoopback &&
-            !address.isLinkLocal) {
-
-          // Extract subnet (e.g., 192.168.1.x)
-          final parts = address.address.split('.');
-          if (parts.length == 4) {
-            final subnet = '${parts[0]}.${parts[1]}.${parts[2]}';
-
-            // Try common host IPs in the subnet
-            final commonHosts = [29, 1, 100, 101, 102, 103, 150, 200];
-
-            for (final host in commonHosts) {
-              final testIP = '$subnet.$host';
-              if (await _testConnection(testIP)) {
-                return testIP;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // Final fallback
-    return 'localhost';
-  }
-
+  /// 🧹 Clear cache (force rediscovery)
   static void clearCache() {
     _cachedBaseUrl = null;
   }
 
+  /// 👤 Fetch user from backend
   Future<AppUser?> getUser(String uid) async {
     final url = await baseUrl;
-    final response = await http.get(Uri.parse('$url/users/$uid'));
+    final uri = Uri.parse('$url/users/$uid');
+    print('📡 Fetching user: $uri');
+    final response = await http.get(uri);
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return AppUser.fromJson(data);
+      return AppUser.fromJson(jsonDecode(response.body));
     } else if (response.statusCode == 404) {
       throw Exception('User not found');
     } else {
@@ -87,23 +80,26 @@ class ApiService {
     }
   }
 
+  /// ✳️ Create user on backend
   Future<AppUser> createUser(AppUser user) async {
     final url = await baseUrl;
+    final uri = Uri.parse('$url/users');
+    print('📤 Creating user: $uri');
+
     try {
       final response = await http.post(
-        Uri.parse('$url/users'),
+        uri,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(user.toJson()),
-      ).timeout(const Duration(seconds: 10));
+      );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return AppUser.fromJson(data);
+        return AppUser.fromJson(jsonDecode(response.body));
       } else {
         throw Exception('Failed to create user: ${response.statusCode}');
       }
     } catch (e) {
-      throw Exception('Backend user creation during login failed: $e');
+      throw Exception('Backend user creation failed: $e');
     }
   }
 }
