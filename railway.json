@@ -1,6 +1,6 @@
 {
   "build": {
-    "builder": "NIXPACKS",
+    "builder": "NODEJS",
     "buildCommand": "npm install",
     "startCommand": "npm start",
     "rootDir": "server"
