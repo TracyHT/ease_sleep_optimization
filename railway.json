@@ -3,6 +3,6 @@
     "builder": "NIXPACKS",
     "buildCommand": "npm install",
     "startCommand": "npm start",
-    "rootDir": "backend"
+    "rootDir": "server"
   }
 }
