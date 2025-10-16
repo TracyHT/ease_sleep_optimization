@@ -4,8 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../../core/constants/app_spacings.dart';
 import '../../../ui/components/gradient_background.dart';
-import '../../../services/api_services.dart';
-import '../../../core/providers/user_provider.dart';
+import '../../../core/providers/auth_state_provider.dart';
 import 'database_cms_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -34,17 +33,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _fetchUser() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) return;
-
-    try {
-      final user = await ApiService().getUser(uid);
-      ref.read(userProvider.notifier).state = user;
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to load user: $e')));
-    }
+    // User is automatically fetched via currentUserProvider
+    // No need for manual fetch
   }
 
   // Future<void> _fetchStatistics() async {
@@ -68,7 +58,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     try {
       await FirebaseAuth.instance.signOut();
-      ref.read(userProvider.notifier).state = null;
+      // User state automatically cleared by authStateProvider
 
       // Navigate to login screen after logout
       if (mounted) {
@@ -92,7 +82,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    final user = ref.watch(userProvider);
+    final userAsync = ref.watch(currentUserProvider);
+    final user = userAsync.when(
+      data: (user) => user,
+      loading: () => null,
+      error: (_, __) => null,
+    );
     //final stats = ref.watch(statisticProvider);
     //final themeMode = ref.watch(themeModeProvider);
 

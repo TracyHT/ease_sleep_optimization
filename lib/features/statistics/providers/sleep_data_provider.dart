@@ -2,7 +2,7 @@ import 'package:ease_sleep_optimization/core/models/sleep_summary_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'selected_date_provider.dart';
-import '../../../services/statistics_data_service.dart';
+import '../../../core/services/statistics_data_service.dart';
 
 final sleepDataProvider = FutureProvider<SleepSummaryData?>((ref) async {
   final selectedDate = ref.watch(selectedDateProvider);

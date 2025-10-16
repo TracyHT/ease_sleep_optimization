@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/sleep_sound.dart';
-import '../../../services/sleep_sounds_api_service.dart';
+import '../../../core/services/sleep_sounds_api_service.dart';
 
 /// Provider for sleep sounds data from API
 final sleepSoundsProvider = FutureProvider<List<SleepSound>>((ref) async {

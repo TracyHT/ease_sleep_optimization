@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../services/database_test_service.dart';
-import '../../services/local_database_service.dart';
+import '../../core/services/database_test_service.dart';
+import '../../core/services/local_database_service.dart';
 
 class DatabaseTestScreen extends StatefulWidget {
   const DatabaseTestScreen({super.key});

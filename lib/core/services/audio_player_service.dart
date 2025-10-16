@@ -1,5 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
-import '../core/models/sleep_sound.dart';
+import '../models/sleep_sound.dart';
 
 /// Singleton service for managing audio playback
 class AudioPlayerService {

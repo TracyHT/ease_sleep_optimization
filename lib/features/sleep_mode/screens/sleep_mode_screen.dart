@@ -1,5 +1,5 @@
 import 'package:ease_sleep_optimization/core/constants/app_spacings.dart';
-import 'package:ease_sleep_optimization/features/sleepMode/screens/sleepSessionView.dart';
+import 'package:ease_sleep_optimization/features/sleep_mode/screens/sleepSessionView.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';

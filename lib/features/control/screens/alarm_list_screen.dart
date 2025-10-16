@@ -6,7 +6,7 @@ import '../../../ui/components/gradient_background.dart';
 import '../providers/alarm_provider.dart';
 import 'add_edit_alarm_screen.dart';
 import 'alarm_ringing_screen.dart';
-import '../../../services/alarm_service.dart';
+import '../../../core/services/alarm_service.dart';
 
 class AlarmListScreen extends ConsumerStatefulWidget {
   const AlarmListScreen({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
-import '../../../services/hive_service.dart';
+import '../../../core/services/hive_service.dart';
 import '../../../ui/components/gradient_background.dart';
 
 class DatabaseCMSScreen extends ConsumerStatefulWidget {

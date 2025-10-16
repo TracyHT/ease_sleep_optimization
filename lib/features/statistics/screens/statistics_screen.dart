@@ -8,8 +8,8 @@ import '../widgets/sleep_summary_widget.dart';
 import '../widgets/sleep_stage_chart_widget.dart';
 import '../providers/sleep_data_provider.dart';
 import '../providers/selected_date_provider.dart';
-import '../../../services/statistics_data_service.dart';
-import '../../../services/local_database_service.dart';
+import '../../../core/services/statistics_data_service.dart';
+import '../../../core/services/local_database_service.dart';
 import '../../../ui/components/section_heading.dart';
 import '../../../ui/components/gradient_background.dart';
 

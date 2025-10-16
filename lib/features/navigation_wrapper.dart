@@ -5,9 +5,9 @@ import '../core/providers/bottom_nav_provider.dart';
 import './settings/screens/settings_screen.dart';
 import './statistics/screens/statistics_screen.dart';
 import './control/screens/controls_screen.dart';
-import './sleepAids/screens/sleepAids_screens.dart';
-import './sleepMode/screens/sleepMode_screen.dart';
-import '../ui/widgets/custom_bottom_nav.dart';
+import './sleep_aids/screens/sleep_aids_screens.dart';
+import './sleep_mode/screens/sleep_mode_screen.dart';
+import '../shared/widgets/custom_bottom_nav.dart';
 
 class NavigationWrapper extends ConsumerWidget {
   const NavigationWrapper({super.key});
@@ -24,24 +24,9 @@ class NavigationWrapper extends ConsumerWidget {
     ];
 
     return Scaffold(
-  body: screens[index],
-  bottomNavigationBar: const CustomBottomNavBar(),
-  floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-  floatingActionButton: Padding(
-    padding: const EdgeInsets.only(bottom: 10), 
-    child: FloatingActionButton(
-      onPressed: () {
-        ref.read(bottomNavIndexProvider.notifier).state = 2;
-      },
-      shape: const CircleBorder(),
-      backgroundColor: Theme.of(context).colorScheme.secondary,
-      foregroundColor: Theme.of(context).colorScheme.onSecondary,
-      elevation: index == 2 ? 8 : 4,
-      child: const Icon(Iconsax.moon5),
-    ),
-  ),
-);
+      body: screens[index],
 
-
+      bottomNavigationBar: const CustomBottomNavBar(),
+    );
   }
 }

@@ -8,9 +8,9 @@ import './features/auth/screens/login_screen.dart';
 import './features/auth/screens/signup_screen.dart';
 import './features/onboarding/screens/welcome_screen.dart';
 import './features/database_test/database_test_screen.dart';
-import './services/hive_service.dart';
-import './services/audio_player_service.dart';
-import './services/alarm_service.dart';
+import './core/services/hive_service.dart';
+import './core/services/audio_player_service.dart';
+import './core/services/alarm_service.dart';
 import './features/control/screens/alarm_ringing_screen.dart';
 
 void main() async {
