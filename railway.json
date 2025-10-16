@@ -1,6 +1,6 @@
 {
   "build": {
-    "builder": "NODEJS",
+    "builder": "RAILPACK",
     "buildCommand": "npm install",
     "startCommand": "npm start",
     "rootDir": "server"
