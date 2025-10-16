@@ -12,19 +12,14 @@ class CustomBottomNavBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(bottomNavIndexProvider);
 
-    // 1. The fixed-height SizedBox has been removed.
     return Stack(
-      // 2. Allow the FAB to draw outside the Stack's bounds.
       clipBehavior: Clip.none,
-      alignment: Alignment.topCenter, // Helps align positioned children
+      alignment: Alignment.topCenter,
       children: [
-        // This is the bottom layer (the nav bar itself)
         _buildBottomNavigationBar(ref, currentIndex),
 
-        // 3. Reposition the FAB to sit on top of the navigation bar.
-        // We use a negative 'top' value to push it upwards.
         Positioned(
-          top: -30, // Adjust this value to control how high the button sits
+          top: -30,
           child: MiddleFABButton(
             isSelected: currentIndex == 2,
             onTap: () {
@@ -39,7 +34,6 @@ class CustomBottomNavBar extends ConsumerWidget {
   }
 
   Widget _buildBottomNavigationBar(WidgetRef ref, int currentIndex) {
-    // This widget remains unchanged.
     return Theme(
       data: Theme.of(ref.context).copyWith(
         splashColor: Colors.transparent,
