@@ -30,7 +30,7 @@ import 'package:iconsax/iconsax.dart';
 import '../../../ui/components/gradient_background.dart';
 import '../providers/brainbit_provider.dart';
 import '../widgets/device_card_widget.dart';
-import '../../sleepMode/screens/brain_monitoring_screen.dart';
+import '../../sleep_mode/screens/brain_monitoring_screen.dart';
 
 /// Main screen for BrainBit device connection management
 class BrainBitConnectionScreen extends ConsumerStatefulWidget {

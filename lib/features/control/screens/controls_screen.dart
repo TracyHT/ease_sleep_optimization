@@ -4,7 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import '../../../core/constants/app_spacings.dart';
 import '../providers/controls_provider.dart';
 import '../../../ui/components/gradient_background.dart';
-import '../../sleepMode/screens/brain_monitoring_screen.dart';
+import '../../sleep_mode/screens/brain_monitoring_screen.dart';
 import '../../brainbit/screens/brainbit_connection_screen.dart';
 
 class ControlsScreen extends ConsumerWidget {

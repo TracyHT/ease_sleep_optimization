@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/alarm.dart';
-import '../../../services/alarm_service.dart';
+import '../../../core/services/alarm_service.dart';
 
 // Provider for all alarms
 final alarmsProvider = StateNotifierProvider<AlarmsNotifier, List<Alarm>>((ref) {

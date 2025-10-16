@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import '../core/models/sleep_sound.dart';
+import '../models/sleep_sound.dart';
+import './api_services.dart';
 
 class SleepSoundsApiService {
-  static const String baseUrl = 'http://192.168.1.102:3000/api/sleep-sounds';
+  static Future<String> get baseUrl async {
+    final apiBaseUrl = await ApiService.baseUrl;
+    return '$apiBaseUrl/sleep-sounds';
+  }
   
   // Get all sleep sounds
   static Future<List<SleepSound>> getAllSleepSounds({
@@ -12,7 +16,7 @@ class SleepSoundsApiService {
     bool? isPremium,
   }) async {
     try {
-      String url = baseUrl;
+      String url = await baseUrl;
       List<String> queryParams = [];
       
       if (category != null) {
@@ -57,8 +61,9 @@ class SleepSoundsApiService {
   // Initialize default sounds in database
   static Future<bool> initializeDefaultSounds() async {
     try {
+      final url = await baseUrl;
       final response = await http.post(
-        Uri.parse('$baseUrl/initialize'),
+        Uri.parse('$url/initialize'),
         headers: {'Content-Type': 'application/json'},
       ).timeout(const Duration(seconds: 30));
       
@@ -78,8 +83,9 @@ class SleepSoundsApiService {
   // Increment popularity when a sound is played
   static Future<void> incrementPopularity(String soundId) async {
     try {
+      final url = await baseUrl;
       await http.post(
-        Uri.parse('$baseUrl/$soundId/play'),
+        Uri.parse('$url/$soundId/play'),
         headers: {'Content-Type': 'application/json'},
       ).timeout(const Duration(seconds: 5));
     } catch (e) {

@@ -1,6 +1,6 @@
-import '../core/models/sleep_summary_data.dart';
-import '../services/local_database_service.dart';
-import '../services/hive_service.dart';
+import '../models/sleep_summary_data.dart';
+import 'local_database_service.dart';
+import 'hive_service.dart';
 
 /// Service for generating statistics from Hive database data
 class StatisticsDataService {

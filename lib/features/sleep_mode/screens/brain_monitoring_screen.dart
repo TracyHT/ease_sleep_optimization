@@ -1,12 +1,16 @@
+import 'dart:async';
+import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:neurosdk2/neurosdk2.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../../ui/components/gradient_background.dart';
 import '../widgets/real_signal_chart_widget.dart';
 
 class BrainMonitoringScreen extends StatefulWidget {
   final BrainBit? sensor;
-  
+
   const BrainMonitoringScreen({super.key, this.sensor});
 
   @override
@@ -18,17 +22,115 @@ class _BrainMonitoringScreenState extends State<BrainMonitoringScreen> {
   String _sessionStatus = "Ready to start";
   DateTime? _sessionStartTime;
 
-  void _toggleMonitoring() {
+  File? _sessionFile;
+  IOSink? _fileSink;
+  StreamSubscription? _signalSub;
+
+  @override
+  void dispose() {
+    _stopMonitoring();
+    super.dispose();
+  }
+
+  void _toggleMonitoring() async {
+    if (_isMonitoring) {
+      await _stopMonitoring();
+    } else {
+      await _startMonitoring();
+    }
+  }
+
+  /// 🟢 Start monitoring EEG session
+  Future<void> _startMonitoring() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final timestamp = DateTime.now().toIso8601String().replaceAll(":", "-");
+    final filePath = "${dir.path}/EEG_Session_$timestamp.csv";
+
+    print("💾 EEG data saved to: ${dir.path}");
+
+    _sessionFile = File(filePath);
+    await _sessionFile!.writeAsString("timestamp,O1,O2,T3,T4\n");
+    _fileSink = _sessionFile!.openWrite(mode: FileMode.append);
+
+    if (widget.sensor != null) {
+      // 🧠 Real BrainBit Mode
+      _signalSub = widget.sensor!.signalDataStream.listen(_onEEGData);
+      await widget.sensor!.execute(FSensorCommand.startSignal);
+      debugPrint("✅ Real BrainBit monitoring started");
+    } else {
+      // 🧪 Demo Mode (no device connected)
+      _signalSub = Stream.periodic(
+        const Duration(milliseconds: 100),
+      ).listen((_) => _simulateEEGData());
+      debugPrint("⚙️ Demo mode active (simulated EEG)");
+    }
+
     setState(() {
-      _isMonitoring = !_isMonitoring;
-      if (_isMonitoring) {
-        _sessionStartTime = DateTime.now();
-        _sessionStatus = "Monitoring active";
-      } else {
-        _sessionStartTime = null;
-        _sessionStatus = "Monitoring stopped";
-      }
+      _isMonitoring = true;
+      _sessionStartTime = DateTime.now();
+      _sessionStatus =
+          widget.sensor != null
+              ? "Monitoring active (Real)"
+              : "Demo mode active";
     });
+
+    debugPrint("💾 Saving EEG data to: $filePath");
+  }
+
+  /// 🔴 Stop monitoring
+  Future<void> _stopMonitoring() async {
+    if (!_isMonitoring) return;
+
+    try {
+      await widget.sensor?.execute(FSensorCommand.stopSignal);
+    } catch (_) {}
+
+    await _signalSub?.cancel();
+    _signalSub = null;
+
+    await _fileSink?.flush();
+    await _fileSink?.close();
+
+    setState(() {
+      _isMonitoring = false;
+      _sessionStartTime = null;
+      _sessionStatus = "Monitoring stopped";
+    });
+
+    debugPrint("🛑 EEG session stopped and file closed.");
+  }
+
+  /// 💾 Handle incoming EEG samples (real data)
+  void _onEEGData(List<BrainBitSignalData> event) {
+    final buffer = StringBuffer();
+
+    for (var sample in event) {
+      final ts = DateTime.now().toIso8601String();
+      final o1 = (sample.o1 * 1e6).toStringAsFixed(3);
+      final o2 = (sample.o2 * 1e6).toStringAsFixed(3);
+      final t3 = (sample.t3 * 1e6).toStringAsFixed(3);
+      final t4 = (sample.t4 * 1e6).toStringAsFixed(3);
+      buffer.writeln("$ts,$o1,$o2,$t3,$t4");
+    }
+
+    _fileSink?.write(buffer.toString());
+  }
+
+  /// 🧪 Simulated EEG generator (for demo mode)
+  void _simulateEEGData() {
+    final ts = DateTime.now().toIso8601String();
+    final random = Random();
+    double baseFreq = 0.5 + random.nextDouble() * 2;
+    double noise = (random.nextDouble() - 0.5) * 10;
+
+    final value =
+        (sin(DateTime.now().millisecond / 100 * baseFreq) * 50 + noise);
+    final o1 = (value + random.nextDouble() * 2).toStringAsFixed(3);
+    final o2 = (value + random.nextDouble() * 2).toStringAsFixed(3);
+    final t3 = (value + random.nextDouble() * 2).toStringAsFixed(3);
+    final t4 = (value + random.nextDouble() * 2).toStringAsFixed(3);
+
+    _fileSink?.writeln("$ts,$o1,$o2,$t3,$t4");
   }
 
   String _getSessionDuration() {
@@ -50,9 +152,7 @@ class _BrainMonitoringScreenState extends State<BrainMonitoringScreen> {
       appBar: AppBar(
         title: Text(
           "Brain Monitoring",
-          style: textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -97,7 +197,8 @@ class _BrainMonitoringScreenState extends State<BrainMonitoringScreen> {
                         Text(
                           _sessionStatus,
                           style: textTheme.titleMedium?.copyWith(
-                            color: _isMonitoring ? Colors.green : Colors.white70,
+                            color:
+                                _isMonitoring ? Colors.green : Colors.white70,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -137,7 +238,10 @@ class _BrainMonitoringScreenState extends State<BrainMonitoringScreen> {
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: _isMonitoring ? Colors.red.shade600 : colorScheme.primary,
+                    backgroundColor:
+                        _isMonitoring
+                            ? Colors.red.shade600
+                            : colorScheme.primary,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -149,7 +253,7 @@ class _BrainMonitoringScreenState extends State<BrainMonitoringScreen> {
                     size: 20,
                   ),
                   label: Text(
-                    _isMonitoring ? "Stop Monitoring" : "Start Monitoring",
+                    _isMonitoring ? "Stop & Save" : "Start Monitoring",
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
@@ -164,7 +268,6 @@ class _BrainMonitoringScreenState extends State<BrainMonitoringScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // Brain Activity Chart
                       RealSignalChartWidget(
                         sensor: widget.sensor,
                         isActive: _isMonitoring,
@@ -176,63 +279,6 @@ class _BrainMonitoringScreenState extends State<BrainMonitoringScreen> {
                           "T4 (Temporal Right)",
                         ],
                       ),
-                      const SizedBox(height: 24),
-
-                      // Sleep Stage Analysis
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.1),
-                            width: 1,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Iconsax.activity,
-                                  color: colorScheme.primary,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  "Sleep Stage Analysis",
-                                  style: textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            if (_isMonitoring) ...[
-                              _buildSleepStageIndicator("Awake", false),
-                              _buildSleepStageIndicator("Light Sleep", true),
-                              _buildSleepStageIndicator("Deep Sleep", false),
-                              _buildSleepStageIndicator("REM Sleep", false),
-                            ] else
-                              Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20),
-                                  child: Text(
-                                    "Start monitoring to see sleep stage analysis",
-                                    style: textTheme.bodyMedium?.copyWith(
-                                      color: Colors.white54,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -240,50 +286,6 @@ class _BrainMonitoringScreenState extends State<BrainMonitoringScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSleepStageIndicator(String stage, bool isActive) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Container(
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isActive ? Colors.blue : Colors.grey.shade600,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            stage,
-            style: TextStyle(
-              color: isActive ? Colors.blue : Colors.white70,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-            ),
-          ),
-          if (isActive) ...[
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.blue.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                "Current",
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ],
       ),
     );
   }

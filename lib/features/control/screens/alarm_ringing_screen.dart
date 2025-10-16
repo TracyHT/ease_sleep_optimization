@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
-import '../../../services/alarm_service.dart';
+import '../../../core/services/alarm_service.dart';
 import '../../../ui/components/gradient_background.dart';
 
 class AlarmRingingScreen extends ConsumerStatefulWidget {

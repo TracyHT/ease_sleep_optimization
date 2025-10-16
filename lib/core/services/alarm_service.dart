@@ -1,7 +1,7 @@
 import 'package:alarm/alarm.dart' as alarm_plugin;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
-import '../core/models/alarm.dart';
+import '../models/alarm.dart';
 import 'hive_service.dart';
 import 'notification_service.dart';
 

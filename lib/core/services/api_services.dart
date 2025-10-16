@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../core/models/user.dart';
+import '../models/user.dart';
 
 class ApiService {
   static String? _cachedBaseUrl;

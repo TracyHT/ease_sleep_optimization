@@ -1,14 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../../services/api_services.dart';
-import '../../../services/local_database_service.dart';
-import '../../../core/models/user.dart'; // your AppUser model
+import '../../../core/services/api_services.dart';
+import '../../../core/services/local_database_service.dart';
+import '../../../core/models/user.dart';
 
 final authControllerProvider = Provider<AuthController>((ref) {
   return AuthController(ref);
 });
-
-final currentUserProvider = StateProvider<AppUser?>((ref) => null);
 
 class AuthController {
   final Ref ref;
@@ -50,8 +48,8 @@ class AuthController {
         }
       }
       
-      // Update current user state
-      ref.read(currentUserProvider.notifier).state = userProfile;
+      // User state is automatically updated by authStateProvider
+      // No need to manually set it here
     } else {
       throw Exception('Failed to get user UID after login');
     }
@@ -89,8 +87,8 @@ class AuthController {
       // Initialize user's local data storage
       await _initializeUserLocalData(firebaseUser.uid);
       
-      // Update current user state
-      ref.read(currentUserProvider.notifier).state = appUser;
+      // User state is automatically updated by authStateProvider
+      // No need to manually set it here
     } else {
       throw Exception('Failed to create user account');
     }
@@ -112,14 +110,10 @@ class AuthController {
   }
 
   Future<void> signOut() async {
-    final currentUser = ref.read(currentUserProvider);
-    
     await _auth.signOut();
-    ref.read(currentUserProvider.notifier).state = null;
-    
+
+    // User state is automatically updated by authStateProvider
     // Optionally clear local data on sign out (comment out to keep data)
-    if (currentUser?.uid != null) {
-      // await LocalDatabaseService.clearUserData(currentUser!.uid!);
-    }
+    // if needed, get user before signOut and clear their data
   }
 }
